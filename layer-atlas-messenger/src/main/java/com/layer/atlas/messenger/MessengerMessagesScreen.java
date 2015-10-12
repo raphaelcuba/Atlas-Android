@@ -138,24 +138,25 @@ public class MessengerMessagesScreen extends Activity {
 
         });
         
-        messageComposer.registerMenuItem("Photo", new OnClickListener() {
+        messageComposer.registerAttachmentHandler("Photo", null, new OnClickListener() {
             public void onClick(View v) {
                 if (!ensureConversationReady()) return;
-                
+
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 String fileName = "cameraOutput" + System.currentTimeMillis() + ".jpg";
                 photoFile = new File(getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES), fileName);
                 final Uri outputUri = Uri.fromFile(photoFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
-                if (debug) Log.w(TAG, "onClick() requesting photo to file: " + fileName + ", uri: " + outputUri);
+                if (debug)
+                    Log.w(TAG, "onClick() requesting photo to file: " + fileName + ", uri: " + outputUri);
                 startActivityForResult(cameraIntent, REQUEST_CODE_CAMERA);
             }
         });
 
-        messageComposer.registerMenuItem("Image", new OnClickListener() {
+        messageComposer.registerAttachmentHandler("Image", null, new OnClickListener() {
             public void onClick(View v) {
                 if (!ensureConversationReady()) return;
-                
+
                 // in onCreate or any event where your want the user to select a file
                 Intent intent = new Intent();
                 intent.setType("image/*");
@@ -164,10 +165,10 @@ public class MessengerMessagesScreen extends Activity {
             }
         });
         
-        messageComposer.registerMenuItem("Location", new OnClickListener() {
+        messageComposer.registerAttachmentHandler("Location", null, new OnClickListener() {
             public void onClick(View v) {
                 if (!ensureConversationReady()) return;
-                
+
                 if (lastKnownLocation == null) {
                     Toast.makeText(v.getContext(), "Inserting Location: Location is unknown yet", Toast.LENGTH_SHORT).show();
                     return;
@@ -175,7 +176,7 @@ public class MessengerMessagesScreen extends Activity {
                 String locationString = "{\"lat\":" + lastKnownLocation.getLatitude() + ", \"lon\":" + lastKnownLocation.getLongitude() + "}";
                 MessagePart part = app.getLayerClient().newMessagePart(Utils.MIME_TYPE_ATLAS_LOCATION, locationString.getBytes());
                 Message message = app.getLayerClient().newMessage(Arrays.asList(part));
-                
+
                 preparePushMetadata(message);
                 conv.send(message);
 

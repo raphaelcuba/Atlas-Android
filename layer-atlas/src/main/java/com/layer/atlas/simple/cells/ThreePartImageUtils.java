@@ -11,7 +11,6 @@ import android.util.Log;
 
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerProgressListener;
-import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.layer.sdk.query.Queryable;
@@ -89,7 +88,7 @@ public class ThreePartImageUtils {
         return message.getMessageParts().get(PART_INDEX_PREVIEW).getId();
     }
 
-    public static Message newThreePartMessage(LayerClient layerClient, Conversation conversation, File imageFile) {
+    public static Message newThreePartMessage(LayerClient layerClient, File imageFile) {
         if (imageFile == null) throw new IllegalArgumentException("Null image file");
         if (!imageFile.exists()) throw new IllegalArgumentException("Image file does not exist");
         if (!imageFile.canRead()) throw new IllegalArgumentException("Cannot read image file");
@@ -123,10 +122,10 @@ public class ThreePartImageUtils {
             Log.e(TAG, e.getMessage(), e);
         }
 
-        return newThreePartMessage(layerClient, conversation, orientation, BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
+        return newThreePartMessage(layerClient, orientation, BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
     }
 
-    public static Message newThreePartMessage(LayerClient layerClient, Conversation conversation, Context context, Uri imageUri) throws IOException {
+    public static Message newThreePartMessage(LayerClient layerClient, Context context, Uri imageUri) throws IOException {
         if (imageUri == null) throw new IllegalArgumentException("Null image Uri");
 
         // Try getting the file so we can parse Exif orientiation.
@@ -135,7 +134,7 @@ public class ThreePartImageUtils {
             if (metaCursor != null) {
                 try {
                     if (metaCursor.moveToFirst()) {
-                        return newThreePartMessage(layerClient, conversation, new File(metaCursor.getString(0)));
+                        return newThreePartMessage(layerClient, new File(metaCursor.getString(0)));
                     }
                 } finally {
                     metaCursor.close();
@@ -149,7 +148,7 @@ public class ThreePartImageUtils {
         InputStream inputStream = null;
         try {
             inputStream = context.getContentResolver().openInputStream(imageUri);
-            return newThreePartMessage(layerClient, conversation, ORIENTATION_0, BitmapFactory.decodeStream(inputStream));
+            return newThreePartMessage(layerClient, ORIENTATION_0, BitmapFactory.decodeStream(inputStream));
         } finally {
             if (inputStream != null) inputStream.close();
         }
@@ -159,13 +158,11 @@ public class ThreePartImageUtils {
      * TODO: reduce memory.  Potentially only work with files.
      *
      * @param client
-     * @param conversation
      * @param fullBitmap
      * @return
      */
-    private static Message newThreePartMessage(LayerClient client, Conversation conversation, int orientation, Bitmap fullBitmap) {
+    private static Message newThreePartMessage(LayerClient client, int orientation, Bitmap fullBitmap) {
         if (client == null) throw new IllegalArgumentException("Null LayerClient");
-        if (conversation == null) throw new IllegalArgumentException("Null Conversation");
         if (fullBitmap == null) throw new IllegalArgumentException("Null Bitmap");
 
         ByteArrayOutputStream fullStream = new ByteArrayOutputStream();
@@ -222,6 +219,38 @@ public class ThreePartImageUtils {
         parts[PART_INDEX_PREVIEW] = preview;
         parts[PART_INDEX_INFO] = info;
         return client.newMessage(parts);
+    }
+
+    /**
+     * Returns int[] {scaledWidth, scaledHeight} for dimensions that fit within the given maxWidth,
+     * maxHeight at the given inWidth, inHeight aspect ratio.  If the in dimensions fit fully inside
+     * the max dimensions, no scaling is applied.  Otherwise, at least one scaled dimension is set
+     * to a max dimension, and the other scaled dimension is scaled to fit.
+     *
+     * @param inWidth
+     * @param inHeight
+     * @param maxWidth
+     * @param maxHeight
+     * @return
+     */
+    public static int[] scaleDownInside(int inWidth, int inHeight, int maxWidth, int maxHeight) {
+        int scaledWidth;
+        int scaledHeight;
+        if (inWidth <= maxWidth && inHeight <= maxHeight) {
+            scaledWidth = inWidth;
+            scaledHeight = inHeight;
+        } else {
+            double widthRatio = (double) inWidth / (double) maxWidth;
+            double heightRatio = (double) inHeight / (double) maxHeight;
+            if (widthRatio > heightRatio) {
+                scaledWidth = maxWidth;
+                scaledHeight = (int) Math.round((double) scaledWidth * (double) inHeight / (double) inWidth);
+            } else {
+                scaledHeight = maxHeight;
+                scaledWidth = (int) Math.round((double) scaledHeight * (double) inWidth / (double) inHeight);
+            }
+        }
+        return new int[]{scaledWidth, scaledHeight};
     }
 
     public static class ThreePartImageInfo {

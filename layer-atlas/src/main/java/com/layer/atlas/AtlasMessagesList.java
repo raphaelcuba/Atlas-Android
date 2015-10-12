@@ -77,6 +77,7 @@ public class AtlasMessagesList extends RecyclerView {
 
         // Create an adapter that auto-scrolls if we're already at the bottom
         mAdapter = new AtlasMessagesAdapter(getContext(), layerClient, participantProvider, picasso)
+                .setRecyclerView(this)
                 .setOnMessageAppendListener(new AtlasMessagesAdapter.OnMessageAppendListener() {
                     @Override
                     public void onMessageAppend(AtlasMessagesAdapter adapter, Message message) {

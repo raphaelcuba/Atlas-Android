@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +61,8 @@ import java.util.Set;
  * @see AtlasCellFactory
  */
 public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdapter.ViewHolder> implements RecyclerViewController.Callback {
+    private static final String TAG = AtlasMessagesAdapter.class.getSimpleName();
+
     private final static int VIEW_TYPE_FOOTER = 0;
 
     protected final LayerClient mLayerClient;
@@ -90,6 +94,8 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
 
     private View mFooterView;
     private int mFooterPosition = 0;
+
+    private RecyclerView mRecyclerView;
 
     public AtlasMessagesAdapter(Context context, LayerClient client, ParticipantProvider participantProvider, Picasso picasso) {
         mQueryController = client.newRecyclerViewController(null, null, this);
@@ -141,6 +147,11 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
      */
     public void refresh() {
         mQueryController.execute();
+    }
+
+    public AtlasMessagesAdapter setRecyclerView(RecyclerView recyclerView) {
+        mRecyclerView = recyclerView;
+        return this;
     }
 
     public void setFooterView(View footerView) {
@@ -243,6 +254,29 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         rootViewHolder.mCellHolder = cellHolder;
         rootViewHolder.mCellHolderSpecs = new AtlasCellFactory.CellHolderSpecs();
         return rootViewHolder;
+    }
+
+    LinkedHashMap<String, long[]> mTimes = new LinkedHashMap<String, long[]>();
+
+    private void time(String key) {
+        long time = System.nanoTime();
+        long[] times = mTimes.get(key);
+        if (times == null) {
+            mTimes.put(key, new long[]{time, 0});
+        } else {
+            times[1] = time;
+        }
+    }
+
+    private void printTimes() {
+        StringBuilder b = new StringBuilder();
+        b.append("\n");
+        for (Map.Entry<String, long[]> entry : mTimes.entrySet()) {
+            double delta = ((double) entry.getValue()[1] - (double) entry.getValue()[0]) / 1000000000.0;
+            if (delta > 0.010) Log.e(TAG, entry.getKey() + " took " + delta);
+            b.append(entry.getKey()).append(": ").append(String.format("%1.4f", delta)).append("\n");
+        }
+        Log.v(TAG, b.toString());
     }
 
     @Override
@@ -349,19 +383,21 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         AtlasCellFactory.CellHolder cellHolder = viewHolder.mCellHolder;
         cellHolder.setMessage(message);
 
-        // TODO: maxWidth assumes the AtlasMessagesList takes up the entire screen width.  Change that.
+        // Cell dimensions
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) viewHolder.mCell.getLayoutParams();
-        int maxWidth = mDisplayMetrics.widthPixels - viewHolder.mRoot.getPaddingLeft() - viewHolder.mRoot.getPaddingRight() - params.leftMargin - params.rightMargin;
+        int maxWidth = mRecyclerView.getWidth() - viewHolder.mRoot.getPaddingLeft() - viewHolder.mRoot.getPaddingRight() - params.leftMargin - params.rightMargin;
         if (!oneOnOne && !cellType.mMe) {
             // Subtract off avatar width if needed
             ViewGroup.MarginLayoutParams avatarParams = (ViewGroup.MarginLayoutParams) viewHolder.mAvatar.getLayoutParams();
             maxWidth -= avatarParams.width + avatarParams.rightMargin + avatarParams.leftMargin;
         }
+        // TODO: subtract spacing rather than multiply by 0.8 to handle screen sizes more cleanly
+        int maxHeight = (int) Math.round(0.8 * mRecyclerView.getHeight());
 
         viewHolder.mCellHolderSpecs.isMe = cellType.mMe;
         viewHolder.mCellHolderSpecs.position = position;
         viewHolder.mCellHolderSpecs.maxWidth = maxWidth;
-
+        viewHolder.mCellHolderSpecs.maxHeight = maxHeight;
         cellType.mCellFactory.bindCellHolder(cellHolder, message, viewHolder.mCellHolderSpecs);
     }
 

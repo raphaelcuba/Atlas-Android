@@ -14,35 +14,33 @@
      limitations under the License.    
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:orientation="horizontal"
-	android:paddingLeft="16dp"    
-	android:paddingRight="16dp"
-    android:background="@drawable/atlas_ctl_menu_item_background"
+              android:layout_width="match_parent"
+              android:layout_height="48dp"
+              android:background="@drawable/atlas_ctl_menu_item_background"
+              android:orientation="horizontal"
+              android:paddingLeft="16dp"
+              android:paddingRight="16dp"
     >
-    
+
     <!-- avatar placeholder -->
-	<ImageView 
-		android:id="@+id/altas_view_message_composer_convert_image"
-		android:layout_width="24dp" 
-		android:layout_height="24dp"
+    <ImageView
+        android:id="@+id/altas_view_message_composer_convert_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
         android:layout_marginRight="8dp"
-		android:layout_gravity="center" 
-		android:background="@drawable/atlas_shape_circle_gray"
-		android:gravity="center" 
+        android:gravity="center"
         android:visibility="gone"
         />
-	
-    <TextView 
-        android:id="@+id/altas_view_message_composer_convert_text"
+
+    <TextView
+        android:id="@+id/altas_view_message_composer_convert_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="@dimen/atlas_text_size_general"
-        android:textColor="@color/atlas_text_black87"
         android:text="Item"
+        android:textColor="@color/atlas_text_black87"
+        android:textSize="@dimen/atlas_text_size_general"
         />
-    
+
 </LinearLayout>

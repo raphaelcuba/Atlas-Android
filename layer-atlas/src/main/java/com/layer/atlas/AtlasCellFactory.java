@@ -106,5 +106,8 @@ public interface AtlasCellFactory<T extends AtlasCellFactory.CellHolder> {
 
         // Maximum width allowed for the CellHolder, useful when resizing images.
         public int maxWidth;
+
+        // Maximum height allowed for the CellHolder, useful when resizing images.
+        public int maxHeight;
     }
 }

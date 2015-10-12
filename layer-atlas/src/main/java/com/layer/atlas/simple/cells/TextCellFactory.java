@@ -13,8 +13,8 @@ import com.layer.sdk.messaging.Message;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TextCellFactory implements AtlasCellFactory<TextCellFactory.TextCellHolder> {
-    private final Map<String, String> mContentCache = new ConcurrentHashMap<String, String>();
+public class TextCellFactory implements AtlasCellFactory<TextCellFactory.CellHolder> {
+    private final Map<String, String> mCache = new ConcurrentHashMap<String, String>();
 
     @Override
     public boolean isBindable(Message message) {
@@ -22,7 +22,7 @@ public class TextCellFactory implements AtlasCellFactory<TextCellFactory.TextCel
     }
 
     @Override
-    public TextCellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
+    public CellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
         Context context = cellView.getContext();
 
         View v = layoutInflater.inflate(R.layout.cell_text, cellView, true);
@@ -30,26 +30,26 @@ public class TextCellFactory implements AtlasCellFactory<TextCellFactory.TextCel
 
         TextView t = (TextView) v.findViewById(R.id.cell_text);
         t.setTextColor(context.getResources().getColor(isMe ? R.color.atlas_text_white : R.color.atlas_text_black));
-        return new TextCellHolder(v);
+        return new CellHolder(v);
     }
 
     @Override
-    public void bindCellHolder(TextCellHolder cellHolder, Message message, CellHolderSpecs specs) {
+    public void bindCellHolder(CellHolder cellHolder, Message message, CellHolderSpecs specs) {
         onCache(message);
-        cellHolder.mTextView.setText(mContentCache.get(message.getId().toString()));
+        cellHolder.mTextView.setText(mCache.get(message.getId().toString()));
     }
 
     @Override
     public void onCache(Message message) {
         String id = message.getId().toString();
-        if (mContentCache.containsKey(id)) return;
-        mContentCache.put(id, new String(message.getMessageParts().get(0).getData()));
+        if (mCache.containsKey(id)) return;
+        mCache.put(id, new String(message.getMessageParts().get(0).getData()));
     }
 
-    static class TextCellHolder extends AtlasCellFactory.CellHolder {
+    static class CellHolder extends AtlasCellFactory.CellHolder {
         TextView mTextView;
 
-        public TextCellHolder(View view) {
+        public CellHolder(View view) {
             mTextView = (TextView) view.findViewById(R.id.cell_text);
         }
     }

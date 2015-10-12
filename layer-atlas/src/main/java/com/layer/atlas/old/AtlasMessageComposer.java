@@ -131,18 +131,25 @@ public class AtlasMessageComposer extends FrameLayout {
 
                 for (AttachmentHandler item : mAttachmentHandlers) {
                     View itemConvert = inflater.inflate(R.layout.old_atlas_view_message_composer_menu_convert, menu, false);
-                    TextView titleText = ((TextView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_text));
-                    titleText.setText(item.title);
+                    TextView titleView = ((TextView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_title));
+                    titleView.setText(item.mTitle);
                     itemConvert.setTag(item);
                     itemConvert.setOnClickListener(new OnClickListener() {
                         public void onClick(View v) {
                             popupWindow.dismiss();
                             AttachmentHandler item = (AttachmentHandler) v.getTag();
-                            if (item.clickListener != null) {
-                                item.clickListener.onClick(v);
+                            if (item.mClickListener != null) {
+                                item.mClickListener.onClick(v);
                             }
                         }
                     });
+                    if (item.mIcon != null) {
+                        ImageView iconView = ((ImageView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_icon));
+                        iconView.setImageResource(item.mIcon);
+                        iconView.setVisibility(VISIBLE);
+                        Drawable d = DrawableCompat.wrap(iconView.getDrawable());
+                        DrawableCompat.setTint(d, R.color.atlas_background_gray);
+                    }
                     menu.addView(itemConvert);
                 }
                 popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -226,12 +233,15 @@ public class AtlasMessageComposer extends FrameLayout {
         mAttachButton.setImageDrawable(d);
     }
 
-    public AtlasMessageComposer registerMenuItem(String title, OnClickListener clickListener) {
-        if (title == null) throw new NullPointerException("Item title must not be null");
-        AttachmentHandler item = new AttachmentHandler();
-        item.title = title;
-        item.clickListener = clickListener;
-        mAttachmentHandlers.add(item);
+    public AtlasMessageComposer registerAttachmentHandler(String title, Integer icon, OnClickListener clickListener) {
+        if (title == null && icon == null) {
+            throw new NullPointerException("Attachment handlers must have at least a title or icon specified.");
+        }
+        AttachmentHandler handler = new AttachmentHandler();
+        handler.mTitle = title;
+        handler.mIcon = icon;
+        handler.mClickListener = clickListener;
+        mAttachmentHandlers.add(handler);
         mAttachButton.setVisibility(View.VISIBLE);
         return this;
     }
@@ -255,7 +265,8 @@ public class AtlasMessageComposer extends FrameLayout {
     }
 
     private static class AttachmentHandler {
-        String title;
-        OnClickListener clickListener;
+        String mTitle;
+        Integer mIcon;
+        OnClickListener mClickListener;
     }
 }

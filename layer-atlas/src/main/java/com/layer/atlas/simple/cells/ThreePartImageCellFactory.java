@@ -18,7 +18,7 @@ import com.squareup.picasso.Transformation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ThreePartImageCellFactory implements AtlasCellFactory<ThreePartImageCellFactory.ImageCellHolder> {
+public class ThreePartImageCellFactory implements AtlasCellFactory<ThreePartImageCellFactory.CellHolder> {
     private static final String TAG = ThreePartImageCellFactory.class.getSimpleName();
 
     private static final int PLACEHOLDER_RES_ID = R.drawable.atlas_message_item_cell_placeholder;
@@ -46,110 +46,82 @@ public class ThreePartImageCellFactory implements AtlasCellFactory<ThreePartImag
     }
 
     @Override
-    public ImageCellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
-        return new ImageCellHolder(layoutInflater.inflate(R.layout.cell_image, cellView, true));
+    public CellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
+        return new CellHolder(layoutInflater.inflate(R.layout.cell_image, cellView, true));
     }
 
     @Override
-    public void bindCellHolder(final ImageCellHolder cellHolder, final Message message, CellHolderSpecs specs) {
+    public void bindCellHolder(final CellHolder cellHolder, final Message message, CellHolderSpecs specs) {
         // Parse into part
         onCache(message);
         ThreePartImageUtils.ThreePartImageInfo info = mInfoCache.get(message.getId().toString());
 
         // Get rotation and scaled dimensions
         final float rotation;
-        int width;
-        int height;
+        final int[] cellDims;
         switch (info.orientation) {
             case ThreePartImageUtils.ORIENTATION_0:
                 rotation = 0f;
-                width = info.width;
-                height = info.height;
+                cellDims = ThreePartImageUtils.scaleDownInside(info.width, info.height, specs.maxWidth, specs.maxHeight);
+                cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[0], cellDims[1]));
                 break;
             case ThreePartImageUtils.ORIENTATION_90:
                 rotation = -90f;
-                width = info.height;
-                height = info.width;
+                cellDims = ThreePartImageUtils.scaleDownInside(info.width, info.height, specs.maxHeight, specs.maxWidth);
+                cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[1], cellDims[0]));
                 break;
             case ThreePartImageUtils.ORIENTATION_180:
                 rotation = 180f;
-                width = info.width;
-                height = info.height;
+                cellDims = ThreePartImageUtils.scaleDownInside(info.width, info.height, specs.maxWidth, specs.maxHeight);
+                cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[0], cellDims[1]));
                 break;
             default:
                 rotation = 90f;
-                width = info.height;
-                height = info.width;
+                cellDims = ThreePartImageUtils.scaleDownInside(info.width, info.height, specs.maxHeight, specs.maxWidth);
+                cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[1], cellDims[0]));
                 break;
         }
-        final int scaledWidth;
-        final int scaledHeight;
-        if (width <= specs.maxWidth) {
-            scaledWidth = width;
-            scaledHeight = height;
-        } else {
-            scaledWidth = specs.maxWidth;
-            scaledHeight = (int) Math.round((double) specs.maxWidth * (double) height / (double) width);
-        }
-
-        cellHolder.mImageView.setImageBitmap(null);
-        cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(scaledWidth, scaledHeight));
-        cellHolder.mImageView.setBackgroundResource(PLACEHOLDER_RES_ID);
 
         if (ThreePartImageUtils.isFullImageReady(message)) {
             // Full image is ready, load it directly.
             mPicasso.load(ThreePartImageUtils.getFullImageId(message))
-                    .tag(ThreePartImageUtils.TAG).noPlaceholder().noFade()
-                    .centerInside().resize(scaledWidth, scaledHeight).rotate(rotation)
-                    .transform(mTransform).into(cellHolder.mImageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    cellHolder.mImageView.setBackgroundDrawable(null);
-                }
-
-                @Override
-                public void onError() {
-                    cellHolder.mImageView.setBackgroundResource(PLACEHOLDER_RES_ID);
-                }
-            });
+                    .tag(ThreePartImageUtils.TAG).placeholder(PLACEHOLDER_RES_ID).noFade()
+                    .centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
+                    .transform(mTransform).into(cellHolder.mImageView);
         } else {
             // Full image is not ready, so start by loading the preview...
             mPicasso.load(ThreePartImageUtils.getPreviewImageId(message))
-                    .tag(ThreePartImageUtils.TAG).noPlaceholder().noFade()
-                    .centerInside().resize(scaledWidth, scaledHeight).rotate(rotation)
+                    .tag(ThreePartImageUtils.TAG).placeholder(PLACEHOLDER_RES_ID).noFade()
+                    .centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
                     .transform(mTransform).into(cellHolder.mImageView, new Callback() {
                 @Override
                 public void onSuccess() {
                     // ...Then load in the full image.
-                    cellHolder.mImageView.setBackgroundDrawable(null);
                     mPicasso.load(ThreePartImageUtils.getFullImageId(message))
                             .tag(ThreePartImageUtils.TAG).noPlaceholder().noFade()
-                            .centerInside().resize(scaledWidth, scaledHeight).rotate(rotation)
+                            .centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
                             .transform(mTransform).into(cellHolder.mImageView, new Callback() {
                         @Override
                         public void onSuccess() {
-                            cellHolder.mImageView.setBackgroundDrawable(null);
                         }
 
                         @Override
                         public void onError() {
-                            cellHolder.mImageView.setBackgroundResource(PLACEHOLDER_RES_ID);
                         }
                     });
                 }
 
                 @Override
                 public void onError() {
-                    cellHolder.mImageView.setBackgroundResource(PLACEHOLDER_RES_ID);
                 }
             });
         }
     }
 
-    static class ImageCellHolder extends AtlasCellFactory.CellHolder {
+    static class CellHolder extends AtlasCellFactory.CellHolder {
         ImageView mImageView;
 
-        public ImageCellHolder(View view) {
+        public CellHolder(View view) {
             mImageView = (ImageView) view.findViewById(R.id.cell_image);
         }
     }
