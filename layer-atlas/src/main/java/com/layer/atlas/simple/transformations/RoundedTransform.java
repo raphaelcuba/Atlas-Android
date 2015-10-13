@@ -14,7 +14,7 @@ public class RoundedTransform implements Transformation {
     private final Paint mPaint;
     private final PorterDuffXfermode mShapeXferMode;
     private final PorterDuffXfermode mBitmapXferMode;
-    
+
     public RoundedTransform(float cornerRadius) {
         mCornerRadius = cornerRadius;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

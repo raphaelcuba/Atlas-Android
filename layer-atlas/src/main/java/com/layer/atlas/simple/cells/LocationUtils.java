@@ -9,6 +9,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.layer.atlas.AtlasCellFactory;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
@@ -83,8 +84,13 @@ public class LocationUtils {
         }
     }
 
-    static class Location {
+    static class Location implements AtlasCellFactory.Cacheable {
         double mLatitude;
         double mLongitude;
+
+        @Override
+        public int sizeOf() {
+            return (Double.SIZE + Double.SIZE) / Byte.SIZE;
+        }
     }
 }

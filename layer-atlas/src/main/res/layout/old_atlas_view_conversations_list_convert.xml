@@ -14,36 +14,36 @@
      limitations under the License.    
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/atlas_view_conversations_list_convert"
-    android:layout_width="match_parent"
-    android:layout_height="72dp" 
-    android:orientation="horizontal" >
+              android:id="@+id/atlas_view_conversations_list_convert"
+              android:layout_width="match_parent"
+              android:layout_height="72dp"
+              android:orientation="horizontal">
 
     <!-- avatar container -->
     <FrameLayout
         android:id="@+id/atlas_view_conversations_list_convert_avatar_container"
-    	android:layout_height="72dp"
-    	android:layout_width="72dp"
-    	>
-    	
-        <ImageView 
+        android:layout_height="72dp"
+        android:layout_width="72dp"
+        >
+
+        <ImageView
             android:id="@+id/atlas_view_conversations_list_convert_avatar_img"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:visibility="visible"
-            />        
-        
+            />
+
         <!-- single person avatar -->
-        <FrameLayout 
+        <FrameLayout
             android:id="@+id/atlas_view_conversations_list_convert_avatar_single"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:visibility="gone"
             >
-            <TextView 
+
+            <TextView
                 android:id="@+id/atlas_view_conversations_list_convert_avatar_single_text"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
@@ -54,16 +54,17 @@
                 android:text="TS"
                 />
         </FrameLayout>
-        
+
         <!-- multi-person avatar -->
-        <FrameLayout 
+        <FrameLayout
             android:id="@+id/atlas_view_conversations_list_convert_avatar_multi"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
             >
+
             <TextView
-                android:id="@+id/atlas_view_conversations_list_convert_avatar_multi_left" 
+                android:id="@+id/atlas_view_conversations_list_convert_avatar_multi_left"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:layout_marginLeft="16dp"
@@ -72,7 +73,8 @@
                 android:textSize="@dimen/atlas_text_size_tiny"
                 android:text="ZF"
                 />
-            <TextView 
+
+            <TextView
                 android:id="@+id/atlas_view_conversations_list_convert_avatar_multi_right"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
@@ -83,79 +85,79 @@
                 android:text="AB"
                 />
         </FrameLayout>
-        
-            
+
+
     </FrameLayout>
-    
+
     <!-- right content part -->
-	<FrameLayout 
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:layout_weight="1"
-		>
-    	
-		<!-- delimiter -->
-        <View 
-        	android:layout_width="match_parent" 
-        	android:layout_height="1dp"
-        	android:layout_gravity="bottom" 
-        	android:background="@color/atlas_delimeter_gray"
-        	/>
-		
-	<LinearLayout 
-		android:orientation="vertical" 
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:paddingRight="16dp"
-		>
-		
-		<!-- Tomaz and time -->
-		<LinearLayout
-			android:orientation="horizontal"
-			android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_weight="1"
-		    >
-		    
-		    <TextView
-    			android:id="@+id/atlas_conversation_view_convert_participant"
-    			android:layout_width="0dp"
-    			android:layout_height="wrap_content"
-    			android:layout_weight="1"
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        >
+
+        <!-- delimiter -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/atlas_delimeter_gray"
+            />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingRight="16dp"
+            >
+
+            <!-- Tomaz and time -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                >
+
+                <TextView
+                    android:id="@+id/atlas_conversation_view_convert_participant"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:textSize="@dimen/atlas_text_size_general"
+                    android:text="Tomaz Stolfa"
+                    />
+
+                <TextView
+                    android:id="@+id/atlas_conversation_view_convert_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:singleLine="true"
+                    android:textSize="@dimen/atlas_text_size_smaller2"
+                    android:textColor="@color/atlas_text_blue"
+                    android:text="16:43"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/atlas_conversation_view_last_message"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:singleLine="true"
-    			android:textSize="@dimen/atlas_text_size_general"
-    			android:text="Tomaz Stolfa" 
-    			/>
-		    
-		    <TextView
-    			android:id="@+id/atlas_conversation_view_convert_time"
-    			android:layout_width="wrap_content"
-    			android:layout_height="wrap_content"
-    			android:layout_gravity="center_vertical"
-                android:paddingLeft="8dp"
-                android:singleLine="true" 
-    			android:textSize="@dimen/atlas_text_size_smaller2"
-    			android:textColor="@color/atlas_text_blue"
-    			android:text="16:43" 
-    			/>
-		    
-		</LinearLayout>
-			
-	    <TextView
-	        android:id="@+id/atlas_conversation_view_last_message"
-	        android:layout_width="wrap_content"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:singleLine="true"
-	        
-	        android:text="You did it! When are we going to see the..."
-	        android:textSize="@dimen/atlas_text_size_smaller"
-	        />
-		
-	    
-	</LinearLayout>
-	
-	</FrameLayout>
-    
+
+                android:text="You did it! When are we going to see the..."
+                android:textSize="@dimen/atlas_text_size_smaller"
+                />
+
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 </LinearLayout>

@@ -24,22 +24,24 @@ import android.util.Log;
 
 /**
  * @author Oleg Orlov
- * @since  24 Jun 2015
+ * @since 24 Jun 2015
  */
 public class GIFDrawable extends Drawable {
     private static final String TAG = GIFDrawable.class.getSimpleName();
     private static final boolean debug = false;
-    
-    /** By default first frame to show wouldn't depend on time of Drawable creation */
+
+    /**
+     * By default first frame to show wouldn't depend on time of Drawable creation
+     */
     private static final long defaultCreatedAt = System.currentTimeMillis();
 
     private Movie gif;
     private long createdAt = defaultCreatedAt;
-    
+
     public GIFDrawable(Movie gif) {
         this.gif = gif;
     }
-    
+
     public GIFDrawable(Movie gif, long createdAt) {
         this.gif = gif;
         this.createdAt = createdAt;
@@ -47,13 +49,14 @@ public class GIFDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
-        if (debug) Log.w(TAG, "draw() gif: " + gif.width() + "x" + gif.height() + " @" + gif.duration());
+        if (debug)
+            Log.w(TAG, "draw() gif: " + gif.width() + "x" + gif.height() + " @" + gif.duration());
         long time = 0;
         if (gif.duration() > 0) {
             time = (System.currentTimeMillis() - createdAt) % gif.duration();
         }
-        gif.setTime((int)time);
-        
+        gif.setTime((int) time);
+
         int saved = canvas.save();
         // prepare bounds
         int gifWidth = gif.width();
@@ -65,8 +68,9 @@ public class GIFDrawable extends Drawable {
         }
         gif.draw(canvas, getBounds().left, getBounds().top);
         canvas.restoreToCount(saved);
-        if (debug) Log.w(TAG, "draw() gif: " + gif.width() + "x" + gif.height() + " @" + gif.duration() 
-                + " time: " + time + ", bounds: " + getBounds().left + "x" + getBounds().top);
+        if (debug)
+            Log.w(TAG, "draw() gif: " + gif.width() + "x" + gif.height() + " @" + gif.duration()
+                    + " time: " + time + ", bounds: " + getBounds().left + "x" + getBounds().top);
         invalidateSelf();
     }
 

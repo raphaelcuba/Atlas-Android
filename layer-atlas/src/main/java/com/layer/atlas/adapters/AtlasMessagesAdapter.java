@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +30,6 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -103,7 +101,10 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
             @Override
             public void onCache(ListViewController listViewController, Message message) {
                 for (AtlasCellFactory factory : mCellFactories) {
-                    if (factory.isBindable(message)) factory.onCache(message);
+                    if (factory.isBindable(message)) {
+                        factory.getCache(message);
+                        break;
+                    }
                 }
             }
         });
@@ -256,28 +257,28 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         return rootViewHolder;
     }
 
-    LinkedHashMap<String, long[]> mTimes = new LinkedHashMap<String, long[]>();
-
-    private void time(String key) {
-        long time = System.nanoTime();
-        long[] times = mTimes.get(key);
-        if (times == null) {
-            mTimes.put(key, new long[]{time, 0});
-        } else {
-            times[1] = time;
-        }
-    }
-
-    private void printTimes() {
-        StringBuilder b = new StringBuilder();
-        b.append("\n");
-        for (Map.Entry<String, long[]> entry : mTimes.entrySet()) {
-            double delta = ((double) entry.getValue()[1] - (double) entry.getValue()[0]) / 1000000000.0;
-            if (delta > 0.010) Log.e(TAG, entry.getKey() + " took " + delta);
-            b.append(entry.getKey()).append(": ").append(String.format("%1.4f", delta)).append("\n");
-        }
-        Log.v(TAG, b.toString());
-    }
+//    LinkedHashMap<String, long[]> mTimes = new LinkedHashMap<String, long[]>();
+//
+//    private void time(String key) {
+//        long time = System.nanoTime();
+//        long[] times = mTimes.get(key);
+//        if (times == null) {
+//            mTimes.put(key, new long[]{time, 0});
+//        } else {
+//            times[1] = time;
+//        }
+//    }
+//
+//    private void printTimes() {
+//        StringBuilder b = new StringBuilder();
+//        b.append("\n");
+//        for (Map.Entry<String, long[]> entry : mTimes.entrySet()) {
+//            double delta = ((double) entry.getValue()[1] - (double) entry.getValue()[0]) / 1000000000.0;
+//            if (delta > 0.010) Log.e(TAG, entry.getKey() + " took " + delta);
+//            b.append(entry.getKey()).append(": ").append(String.format("%1.4f", delta)).append("\n");
+//        }
+//        Log.v(TAG, b.toString());
+//    }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
@@ -398,7 +399,7 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         viewHolder.mCellHolderSpecs.position = position;
         viewHolder.mCellHolderSpecs.maxWidth = maxWidth;
         viewHolder.mCellHolderSpecs.maxHeight = maxHeight;
-        cellType.mCellFactory.bindCellHolder(cellHolder, message, viewHolder.mCellHolderSpecs);
+        cellType.mCellFactory.bindCellHolder(cellHolder, cellType.mCellFactory.getCache(message), message, viewHolder.mCellHolderSpecs);
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.layer.atlas.AtlasCellFactory;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerProgressListener;
 import com.layer.sdk.messaging.Message;
@@ -253,10 +254,15 @@ public class ThreePartImageUtils {
         return new int[]{scaledWidth, scaledHeight};
     }
 
-    public static class ThreePartImageInfo {
+    public static class ThreePartImageInfo implements AtlasCellFactory.Cacheable {
         public int orientation;
         public int width;
         public int height;
+
+        @Override
+        public int sizeOf() {
+            return (Integer.SIZE + Integer.SIZE + Integer.SIZE) / Byte.SIZE;
+        }
     }
 
     public static class RequestHandler extends com.squareup.picasso.RequestHandler {

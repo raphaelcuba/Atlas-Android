@@ -42,7 +42,7 @@
         <attr name="composerTextSize"/>
         <attr name="composerTextTypeface"/>
         <attr name="composerTextStyle"/>
-        <attr name="android:enabled" />
+        <attr name="android:enabled"/>
     </declare-styleable>
 
     <!-- TODO: use "android:" when possible  -->

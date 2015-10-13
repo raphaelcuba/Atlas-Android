@@ -14,22 +14,22 @@
      limitations under the License.    
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    
+
     <item android:state_pressed="true">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android" 
-            android:shape="rectangle">
-        	<solid android:color="@color/atlas_menu_item_background_gray"/>
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+               android:shape="rectangle">
+            <solid android:color="@color/atlas_menu_item_background_gray"/>
         </shape>
 
     </item>
-    
+
     <item>
         <shape xmlns:android="http://schemas.android.com/apk/res/android"
-        	android:shape="rectangle">
-        	<solid android:color="@color/atlas_background_transparent"/>
+               android:shape="rectangle">
+            <solid android:color="@color/atlas_background_transparent"/>
         </shape>
     </item>
-    
+
 </selector>
 
 

@@ -10,11 +10,10 @@ import com.layer.atlas.AtlasCellFactory;
 import com.layer.atlas.R;
 import com.layer.sdk.messaging.Message;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class TextCellFactory implements AtlasCellFactory<TextCellFactory.CellHolder> {
-    private final Map<String, String> mCache = new ConcurrentHashMap<String, String>();
+public class TextCellFactory extends AtlasCellFactory<TextCellFactory.CellHolder, TextCellFactory.CacheableString> {
+    public TextCellFactory() {
+        super(2 * 1024 * 1024);
+    }
 
     @Override
     public boolean isBindable(Message message) {
@@ -34,16 +33,13 @@ public class TextCellFactory implements AtlasCellFactory<TextCellFactory.CellHol
     }
 
     @Override
-    public void bindCellHolder(CellHolder cellHolder, Message message, CellHolderSpecs specs) {
-        onCache(message);
-        cellHolder.mTextView.setText(mCache.get(message.getId().toString()));
+    public CacheableString cache(Message message) {
+        return new CacheableString(new String(message.getMessageParts().get(0).getData()));
     }
 
     @Override
-    public void onCache(Message message) {
-        String id = message.getId().toString();
-        if (mCache.containsKey(id)) return;
-        mCache.put(id, new String(message.getMessageParts().get(0).getData()));
+    public void bindCellHolder(CellHolder cellHolder, CacheableString string, Message message, CellHolderSpecs specs) {
+        cellHolder.mTextView.setText(string.toString());
     }
 
     static class CellHolder extends AtlasCellFactory.CellHolder {
@@ -51,6 +47,30 @@ public class TextCellFactory implements AtlasCellFactory<TextCellFactory.CellHol
 
         public CellHolder(View view) {
             mTextView = (TextView) view.findViewById(R.id.cell_text);
+        }
+    }
+
+    public static class CacheableString implements AtlasCellFactory.Cacheable {
+        private final String mString;
+        private final int mSize;
+
+        public CacheableString(String string) {
+            mString = string;
+            mSize = mString.getBytes().length;
+        }
+
+        public String getString() {
+            return mString;
+        }
+
+        @Override
+        public int sizeOf() {
+            return mSize;
+        }
+
+        @Override
+        public String toString() {
+            return mString;
         }
     }
 }

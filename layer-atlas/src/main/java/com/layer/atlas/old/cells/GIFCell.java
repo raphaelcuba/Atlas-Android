@@ -20,43 +20,44 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 
-import com.layer.atlas.old.Utils;
-import com.layer.atlas.old.Utils.ImageLoader.InputStreamProvider;
 import com.layer.atlas.old.AtlasMessageListOld;
 import com.layer.atlas.old.GIFDrawable;
+import com.layer.atlas.old.Utils;
+import com.layer.atlas.old.Utils.ImageLoader.InputStreamProvider;
 import com.layer.sdk.messaging.MessagePart;
 
 /**
  * @author Oleg Orlov
- * @since  21 Jun 2015
+ * @since 21 Jun 2015
  */
 public class GIFCell extends ImageCell {
     private static final String TAG = GIFCell.class.getSimpleName();
     private static final boolean debug = false;
-    
+
     public GIFCell(MessagePart fullImagePart, MessagePart previewImagePart, int width, int height, int orientation, AtlasMessageListOld messagesList) {
         super(fullImagePart, previewImagePart, width, height, orientation, messagesList);
     }
-    
+
     public GIFCell(MessagePart fullImagePart, AtlasMessageListOld messagesList) {
         super(fullImagePart, messagesList);
     }
 
     @Override
     protected Drawable getDrawable(MessagePart workingPart) {
-        Movie mov  = (Movie) Utils.imageLoader.getImageFromCache(workingPart.getId());
-        
+        Movie mov = (Movie) Utils.imageLoader.getImageFromCache(workingPart.getId());
+
         // TODO: calculate properly with rotation
-        int requiredWidth  = messagesList.getWidth();
+        int requiredWidth = messagesList.getWidth();
         int requiredHeight = messagesList.getHeight();
-        
+
         if (mov != null) {
-            if (debug) Log.i(TAG, "gif.onBind() returned from cache! " + mov.width() + "x" + mov.height() 
-                    + ", req: " + requiredWidth + "x" + requiredHeight + " for " + workingPart.getId());
+            if (debug)
+                Log.i(TAG, "gif.onBind() returned from cache! " + mov.width() + "x" + mov.height()
+                        + ", req: " + requiredWidth + "x" + requiredHeight + " for " + workingPart.getId());
             return new GIFDrawable(mov);
-        } else if (workingPart.isContentReady()){
+        } else if (workingPart.isContentReady()) {
             final Uri id = workingPart.getId();
-            InputStreamProvider streamProvider = new Utils.MessagePartBufferedStreamProvider(workingPart); 
+            InputStreamProvider streamProvider = new Utils.MessagePartBufferedStreamProvider(workingPart);
             imageSpec = Utils.imageLoader.requestImage(id, streamProvider, requiredWidth, requiredHeight, true, this);
         }
         return null;

@@ -15,11 +15,6 @@
  */
 package com.layer.atlas.old.cells;
 
-import java.io.File;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -28,34 +23,39 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.layer.atlas.R;
+import com.layer.atlas.old.AtlasMessageListOld;
+import com.layer.atlas.old.ShapedFrameLayout;
 import com.layer.atlas.old.Utils;
 import com.layer.atlas.old.Utils.ImageLoader;
 import com.layer.atlas.old.Utils.ImageLoader.ImageSpec;
 import com.layer.atlas.old.Utils.Tools;
-import com.layer.atlas.old.AtlasMessageListOld;
-import com.layer.atlas.R;
-import com.layer.atlas.old.ShapedFrameLayout;
 import com.layer.sdk.messaging.MessagePart;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 
 /**
  * @author Oleg Orlov
- * @since  13 May 2015
+ * @since 13 May 2015
  */
 public class GeoCell extends Cell implements Utils.DownloadQueue.CompleteListener, ImageLoader.ImageLoadListener {
     private static final String TAG = GeoCell.class.getSimpleName();
     private static final boolean debug = false;
-    
+
     double lon;
     double lat;
-    
+
     ImageSpec spec;
-    
+
     final AtlasMessageListOld messagesList;
 
     public GeoCell(MessagePart messagePart, AtlasMessageListOld messagesList) {
         super(messagePart);
         this.messagesList = messagesList;
-        
+
         String jsonLonLat = new String(messagePart.getData());
         try {
             JSONObject json = new JSONObject(jsonLonLat);
@@ -68,19 +68,19 @@ public class GeoCell extends Cell implements Utils.DownloadQueue.CompleteListene
 
     @Override
     public View onBind(final ViewGroup cellContainer) {
-        
+
         ViewGroup cellRoot = (ViewGroup) Tools.findChildById(cellContainer, R.id.atlas_view_messages_cell_geo);
         if (cellRoot == null) {
             cellRoot = (ViewGroup) LayoutInflater.from(cellContainer.getContext()).inflate(R.layout.old_atlas_view_messages_cell_geo, cellContainer, false);
             if (debug) Log.w(TAG, "geo.onBind() inflated geo cell");
         }
 
-        ImageView geoImageMy    = (ImageView) cellRoot.findViewById(R.id.atlas_view_messages_cell_geo_image_my);
+        ImageView geoImageMy = (ImageView) cellRoot.findViewById(R.id.atlas_view_messages_cell_geo_image_my);
         ImageView geoImageTheir = (ImageView) cellRoot.findViewById(R.id.atlas_view_messages_cell_geo_image_their);
-        View containerMy    = cellRoot.findViewById(R.id.atlas_view_messages_cell_geo_container_my);
+        View containerMy = cellRoot.findViewById(R.id.atlas_view_messages_cell_geo_container_my);
         View containerTheir = cellRoot.findViewById(R.id.atlas_view_messages_cell_geo_container_their);
-        
-        boolean myMessage = messagesList.getLayerClient().getAuthenticatedUserId().equals(messagePart.getMessage().getSender().getUserId()); 
+
+        boolean myMessage = messagesList.getLayerClient().getAuthenticatedUserId().equals(messagePart.getMessage().getSender().getUserId());
         if (myMessage) {
             containerMy.setVisibility(View.VISIBLE);
             containerTheir.setVisibility(View.GONE);
@@ -88,9 +88,9 @@ public class GeoCell extends Cell implements Utils.DownloadQueue.CompleteListene
             containerMy.setVisibility(View.GONE);
             containerTheir.setVisibility(View.VISIBLE);
         }
-        ImageView geoImage = myMessage ? geoImageMy : geoImageTheir; 
+        ImageView geoImage = myMessage ? geoImageMy : geoImageTheir;
         ShapedFrameLayout cellCustom = (ShapedFrameLayout) (myMessage ? containerMy : containerTheir);
-        
+
         Object imageId = messagePart.getId();
         Bitmap bmp = (Bitmap) Utils.imageLoader.getImageFromCache(imageId);
         if (bmp != null) {
@@ -106,8 +106,8 @@ public class GeoCell extends Cell implements Utils.DownloadQueue.CompleteListene
                 // request decoding
                 spec = Utils.imageLoader.requestImage(imageId
                         , new Utils.FileStreamProvider(tileFile)
-                        , (int)Tools.getPxFromDp(150, cellContainer.getContext())
-                        , (int)Tools.getPxFromDp(150, cellContainer.getContext()), false, this);
+                        , (int) Tools.getPxFromDp(150, cellContainer.getContext())
+                        , (int) Tools.getPxFromDp(150, cellContainer.getContext()), false, this);
             } else {
                 int width = 300;
                 int height = 300;
@@ -121,13 +121,13 @@ public class GeoCell extends Cell implements Utils.DownloadQueue.CompleteListene
                         .append("maptype=roadmap&")
                         .append("markers=color:red%7C").append(lat).append(",").append(lon)
                         .toString();
-                
+
                 Utils.downloadQueue.schedule(url, tileFile, this);
-                
+
                 if (debug) Log.d(TAG, "geo.onBind() show stub and download image: " + tileFile);
             }
         }
-        
+
         // clustering
         cellCustom.setCornerRadiusDp(16, 16, 16, 16);
         if (TextCell.CLUSTERED_BUBBLES) {
@@ -152,7 +152,7 @@ public class GeoCell extends Cell implements Utils.DownloadQueue.CompleteListene
 
         return cellRoot;
     }
-    
+
     private File getTileFile(Context context) {
         String fileDir = context.getCacheDir() + File.separator + "geo";
         String fileName = String.format("%f_%f.png", lat, lon);

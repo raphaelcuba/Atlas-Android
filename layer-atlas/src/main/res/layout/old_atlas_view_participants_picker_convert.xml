@@ -15,71 +15,70 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="48dp" 
-    android:orientation="horizontal" 
-    android:background="@color/atlas_view_participant_picker_list_background"
+              android:layout_width="match_parent"
+              android:layout_height="48dp"
+              android:orientation="horizontal"
+              android:background="@color/atlas_view_participant_picker_list_background"
     >
 
     <!-- avatar placeholder -->
     <FrameLayout
-    	android:layout_height="48dp"
-    	android:layout_width="48dp"
-    	>
-        
-        <ImageView 
+        android:layout_height="48dp"
+        android:layout_width="48dp"
+        >
+
+        <ImageView
             android:id="@+id/atlas_view_participants_picker_convert_avatar_img"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
-            />        
-        
-    	<TextView 
-    		android:id="@+id/atlas_view_participants_picker_convert_ava"
-    		android:layout_width="32dp"
-    		android:layout_height="32dp"
-    		android:layout_gravity="center"
-    		android:text="TS"
-    		android:gravity="center"
-    		/>
+            />
+
+        <TextView
+            android:id="@+id/atlas_view_participants_picker_convert_ava"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:text="TS"
+            android:gravity="center"
+            />
     </FrameLayout>
-    
+
     <!-- right content part -->
-	<FrameLayout 
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:layout_weight="1"
-		>
-    	
-		<!-- delimiter -->
-        <View 
-        	android:layout_width="match_parent" 
-        	android:layout_height="1dp"
-        	android:layout_gravity="bottom" 
-        	android:background="@color/atlas_delimeter_gray"
-        	/>
-		
-	<LinearLayout 
-		android:orientation="vertical" 
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-		android:layout_gravity="center"
-		android:paddingRight="16dp"
-		>
-		
-		<TextView
-    		android:id="@+id/atlas_view_participants_picker_convert_name"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-    		android:text="Tomaz Stolfa" 
-    		android:textSize="16sp"
-    		/>
-	    
-	</LinearLayout>
-	
-	</FrameLayout>
-    
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        >
+
+        <!-- delimiter -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/atlas_delimeter_gray"
+            />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:paddingRight="16dp"
+            >
+
+            <TextView
+                android:id="@+id/atlas_view_participants_picker_convert_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tomaz Stolfa"
+                android:textSize="16sp"
+                />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 </LinearLayout>

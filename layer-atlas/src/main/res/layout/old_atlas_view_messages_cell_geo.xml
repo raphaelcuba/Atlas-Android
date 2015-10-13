@@ -14,14 +14,13 @@
      limitations under the License.    
 -->
 <FrameLayout
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    
+
     android:id="@+id/atlas_view_messages_cell_geo"
-    
-    android:layout_width="match_parent"    
-    android:layout_height="match_parent"    
-    
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
     >
 
     <com.layer.atlas.old.ShapedFrameLayout
@@ -30,27 +29,29 @@
         android:layout_height="wrap_content"
         android:layout_gravity="left"
         >
+
         <ImageView
-            android:id="@+id/atlas_view_messages_cell_geo_image_their" 
+            android:id="@+id/atlas_view_messages_cell_geo_image_their"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="left|center_horizontal"
             android:background="@color/atlas_background_gray"
             />
     </com.layer.atlas.old.ShapedFrameLayout>
-    
+
     <com.layer.atlas.old.ShapedFrameLayout
         android:id="@+id/atlas_view_messages_cell_geo_container_my"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         >
+
         <ImageView
-            android:id="@+id/atlas_view_messages_cell_geo_image_my" 
+            android:id="@+id/atlas_view_messages_cell_geo_image_my"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:background="@color/atlas_background_gray"
-            />    
+            />
     </com.layer.atlas.old.ShapedFrameLayout>
 
 </FrameLayout>

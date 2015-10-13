@@ -14,10 +14,10 @@
      limitations under the License.    
 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-	android:shape="oval"
-	android:radius="16dp"
-	>
-	
-	<solid android:color="@color/atlas_shape_avatar_gray"/>
-	
+       android:shape="oval"
+       android:radius="16dp"
+    >
+
+    <solid android:color="@color/atlas_shape_avatar_gray"/>
+
 </shape>

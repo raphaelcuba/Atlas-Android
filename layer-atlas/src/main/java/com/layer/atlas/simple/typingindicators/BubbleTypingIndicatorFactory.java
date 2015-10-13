@@ -11,8 +11,8 @@ import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.layer.atlas.R;
 import com.layer.atlas.AtlasTypingIndicator;
+import com.layer.atlas.R;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 
 import java.util.HashSet;

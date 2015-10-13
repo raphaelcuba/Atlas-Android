@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.layer.atlas.old.AtlasMessageListOld;
 import com.layer.atlas.R;
+import com.layer.atlas.old.AtlasMessageListOld;
 import com.layer.atlas.old.Utils;
 import com.layer.sdk.messaging.MessagePart;
 

@@ -14,28 +14,27 @@
      limitations under the License.    
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" 
-    android:orientation="vertical" >
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-	<LinearLayout
-		android:orientation="horizontal"
-		android:layout_width="match_parent"
-		android:layout_height="48dp"
-		android:background="@color/atlas_view_participant_picker_text_background"
-		>
-		
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/atlas_view_participant_picker_text_background"
+        >
+
         <!-- android:fillViewport="true" + child.width:wrap_content stretch child to match scroller -->
-		<HorizontalScrollView 
+        <HorizontalScrollView
             android:id="@+id/atlas_participants_picker_scroll"
-			android:layout_width="0dp"
-			android:layout_height="48dp"
-			android:layout_weight="1"
-			android:scrollbars="none"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:scrollbars="none"
             android:fillViewport="true"
             >
-        
+
             <!-- addStatesFromChildren will make layout style == filterText child 
                 style="@android:style/Widget.EditText" - pretend to be an EditText :)
                 
@@ -48,12 +47,12 @@
                 android:layout_height="48dp"
                 style="@android:style/Widget.EditText"
                 android:background="@drawable/atlas_ctl_edit_text"
-                android:addStatesFromChildren="true" 
-                android:minHeight="48dp" 
-                android:orientation="horizontal" 
-                android:clickable="false" 
+                android:addStatesFromChildren="true"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                android:clickable="false"
                 >
-                
+
                 <!-- 
                     XXX: Dynamically inserted views are positioned properly without 
                          android:gravity="center_vertical" ... that is strange and not clear why.
@@ -77,37 +76,37 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical" />
                  -->
-                
-        		<EditText 
-        			android:id="@+id/atlas_participants_picker_text"
-        			android:layout_width="match_parent"
-        			android:layout_height="48dp"
+
+                <EditText
+                    android:id="@+id/atlas_participants_picker_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
                     android:minWidth="12dp"
                     android:paddingLeft="4dp"
                     android:singleLine="true"
                     android:background="@color/atlas_background_white"
-        			/>
-                
+                    />
+
             </LinearLayout>
-			
-		</HorizontalScrollView>
-		
-		
-		<TextView
-			android:id="@+id/atlas_participants_picker_plus" 
-			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:gravity="center"
-			android:text="+"
-			/>
-		
-	</LinearLayout>
-	
-	<ListView 
-		android:id="@+id/atlas_participants_picker_list"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:divider="@color/atlas_view_participant_picker_list_background"
-		/>
-    
+
+        </HorizontalScrollView>
+
+
+        <TextView
+            android:id="@+id/atlas_participants_picker_plus"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="+"
+            />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/atlas_participants_picker_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@color/atlas_view_participant_picker_list_background"
+        />
+
 </LinearLayout>
