@@ -10,7 +10,7 @@ import com.layer.atlas.R;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 
-public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder, MimeCellFactory.CacheableString> {
+public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder, MimeCellFactory.ParsedContentString> {
     public MimeCellFactory() {
         super(32 * 1024);
     }
@@ -26,7 +26,7 @@ public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder
     }
 
     @Override
-    public CacheableString cache(Message message) {
+    public ParsedContentString parseContent(Message message) {
         StringBuilder builder = new StringBuilder();
         int i = 0;
         for (MessagePart part : message.getMessageParts()) {
@@ -34,11 +34,11 @@ public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder
             builder.append("MIME Type [").append(i).append("]: ").append(part.getMimeType());
             i++;
         }
-        return new CacheableString(builder.toString());
+        return new ParsedContentString(builder.toString());
     }
 
     @Override
-    public void bindCellHolder(CellHolder cellHolder, CacheableString string, Message message, CellHolderSpecs specs) {
+    public void bindCellHolder(CellHolder cellHolder, ParsedContentString string, Message message, CellHolderSpecs specs) {
         cellHolder.mTextView.setText(string.toString());
     }
 
@@ -50,11 +50,11 @@ public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder
         }
     }
 
-    public static class CacheableString implements AtlasCellFactory.Cacheable {
+    public static class ParsedContentString implements AtlasCellFactory.ParsedContent {
         private final String mString;
         private final int mSize;
 
-        public CacheableString(String string) {
+        public ParsedContentString(String string) {
             mString = string;
             mSize = mString.getBytes().length;
         }

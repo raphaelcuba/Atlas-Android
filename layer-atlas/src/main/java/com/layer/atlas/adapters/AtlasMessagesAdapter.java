@@ -102,7 +102,7 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
             public void onCache(ListViewController listViewController, Message message) {
                 for (AtlasCellFactory factory : mCellFactories) {
                     if (factory.isBindable(message)) {
-                        factory.getCache(message);
+                        factory.getParsedContent(message);
                         break;
                     }
                 }
@@ -399,7 +399,7 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         viewHolder.mCellHolderSpecs.position = position;
         viewHolder.mCellHolderSpecs.maxWidth = maxWidth;
         viewHolder.mCellHolderSpecs.maxHeight = maxHeight;
-        cellType.mCellFactory.bindCellHolder(cellHolder, cellType.mCellFactory.getCache(message), message, viewHolder.mCellHolderSpecs);
+        cellType.mCellFactory.bindCellHolder(cellHolder, cellType.mCellFactory.getParsedContent(message), message, viewHolder.mCellHolderSpecs);
     }
 
     @Override

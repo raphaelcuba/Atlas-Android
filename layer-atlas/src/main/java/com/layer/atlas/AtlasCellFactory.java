@@ -10,7 +10,7 @@ import com.layer.sdk.messaging.Message;
 /**
  * CellFactories manage one or more types ot Messages for display within an AtlasMessagesAdapter.
  */
-public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHolder, Tcache extends AtlasCellFactory.Cacheable> {
+public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHolder, Tcache extends AtlasCellFactory.ParsedContent> {
     private final LruCache<String, Tcache> mCache;
 
     public AtlasCellFactory(int cacheBytes) {
@@ -48,10 +48,10 @@ public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHold
     /**
      * Provides an opportunity to parse this AtlasCellFactory Message data in a background thread.
      *
-     * @param message
-     * @return
+     * @param message Message to parse
+     * @return Cacheable parsed object generated from the given Message
      */
-    public abstract Tcache cache(Message message);
+    public abstract Tcache parseContent(Message message);
 
     /**
      * Renders a Message by applying data to the provided CellHolder.  The CellHolder was previously
@@ -64,11 +64,18 @@ public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHold
      */
     public abstract void bindCellHolder(Tholder cellHolder, Tcache cached, Message message, CellHolderSpecs specs);
 
-    public Tcache getCache(Message message) {
+    /**
+     * Returns previously parsed content for this Message, or calls parseContent() if it has not
+     * been previously parsed.
+     *
+     * @param message Message to return parsed content object for.
+     * @return Parsed content object for the given Message.
+     */
+    public Tcache getParsedContent(Message message) {
         String id = message.getId().toString();
         Tcache value = mCache.get(id);
         if (value != null) return value;
-        value = cache(message);
+        value = parseContent(message);
         if (value != null) mCache.put(id, value);
         return value;
     }
@@ -139,7 +146,18 @@ public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHold
         public int maxHeight;
     }
 
-    public interface Cacheable {
+    /**
+     * Object intended to hold parsed content generated from a Message's MessagePart data arrays.
+     * When parsing takes time, like parsing serialized JSON, this can improve UI performance by
+     * pre-caching parsed content off the main thread, and providing the parsed content when binding
+     * cell holders.
+     */
+    public interface ParsedContent {
+        /**
+         * Returns the size of this ParsedContent in bytes.
+         *
+         * @return The size of this ParsedContent in bytes.
+         */
         int sizeOf();
     }
 }

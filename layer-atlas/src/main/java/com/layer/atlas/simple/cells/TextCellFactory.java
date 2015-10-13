@@ -10,7 +10,7 @@ import com.layer.atlas.AtlasCellFactory;
 import com.layer.atlas.R;
 import com.layer.sdk.messaging.Message;
 
-public class TextCellFactory extends AtlasCellFactory<TextCellFactory.CellHolder, TextCellFactory.CacheableString> {
+public class TextCellFactory extends AtlasCellFactory<TextCellFactory.CellHolder, TextCellFactory.ParsedContentString> {
     public TextCellFactory() {
         super(2 * 1024 * 1024);
     }
@@ -33,12 +33,12 @@ public class TextCellFactory extends AtlasCellFactory<TextCellFactory.CellHolder
     }
 
     @Override
-    public CacheableString cache(Message message) {
-        return new CacheableString(new String(message.getMessageParts().get(0).getData()));
+    public ParsedContentString parseContent(Message message) {
+        return new ParsedContentString(new String(message.getMessageParts().get(0).getData()));
     }
 
     @Override
-    public void bindCellHolder(CellHolder cellHolder, CacheableString string, Message message, CellHolderSpecs specs) {
+    public void bindCellHolder(CellHolder cellHolder, ParsedContentString string, Message message, CellHolderSpecs specs) {
         cellHolder.mTextView.setText(string.toString());
     }
 
@@ -50,11 +50,11 @@ public class TextCellFactory extends AtlasCellFactory<TextCellFactory.CellHolder
         }
     }
 
-    public static class CacheableString implements AtlasCellFactory.Cacheable {
+    public static class ParsedContentString implements AtlasCellFactory.ParsedContent {
         private final String mString;
         private final int mSize;
 
-        public CacheableString(String string) {
+        public ParsedContentString(String string) {
             mString = string;
             mSize = mString.getBytes().length;
         }
