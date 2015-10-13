@@ -35,21 +35,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ThreePartImageCellFactory handles image Messages with three parts: full image, preview image, and
+ * PreviewImageCellFactory handles image Messages with three parts: full image, preview image, and
  * image metadata.  The image metadata contains full image dimensions and rotation information used
  * for sizing and rotating images efficiently.
  */
-public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCellFactory.CellHolder, ThreePartImageCellFactory.ThreePartImageInfo> {
-    public static final String TAG = ThreePartImageCellFactory.class.getSimpleName();
+public class PreviewImageCellFactory extends AtlasCellFactory<PreviewImageCellFactory.CellHolder, PreviewImageCellFactory.PreviewImageInfo> {
+    public static final String TAG = PreviewImageCellFactory.class.getSimpleName();
 
     private static final int PLACEHOLDER_RES_ID = R.drawable.atlas_message_item_cell_placeholder;
 
-    private static final String MIME_PREVIEW_SUFFIX = "+preview";
-    private static final String MIME_INFO = "application/json+imageSize";
+    public static final String MIME_PREVIEW = "image/jpeg+preview";
+    public static final String MIME_INFO = "application/json+imageSize";
 
     private static final int PART_INDEX_FULL = 0;
     private static final int PART_INDEX_PREVIEW = 1;
@@ -67,7 +68,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     private final Picasso mPicasso;
     private final Transformation mTransform;
 
-    public ThreePartImageCellFactory(Context context, Picasso picasso) {
+    public PreviewImageCellFactory(Context context, Picasso picasso) {
         super(32 * 1024);
         mPicasso = picasso;
         float radius = context.getResources().getDimension(com.layer.atlas.R.dimen.atlas_message_item_cell_radius);
@@ -84,8 +85,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
         List<MessagePart> parts = message.getMessageParts();
         return parts.size() == 3 &&
                 parts.get(PART_INDEX_FULL).getMimeType().startsWith("image/") &&
-                parts.get(PART_INDEX_PREVIEW).getMimeType().startsWith("image/") &&
-                parts.get(PART_INDEX_PREVIEW).getMimeType().endsWith(MIME_PREVIEW_SUFFIX) &&
+                parts.get(PART_INDEX_PREVIEW).getMimeType().equals(MIME_PREVIEW) &&
                 parts.get(PART_INDEX_INFO).getMimeType().equals(MIME_INFO);
     }
 
@@ -95,9 +95,9 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     }
 
     @Override
-    public ThreePartImageInfo parseContent(Message message) {
+    public PreviewImageInfo parseContent(Message message) {
         try {
-            ThreePartImageInfo info = new ThreePartImageInfo();
+            PreviewImageInfo info = new PreviewImageInfo();
             JSONObject infoObject = new JSONObject(new String(message.getMessageParts().get(PART_INDEX_INFO).getData()));
             info.orientation = infoObject.getInt("orientation");
             info.width = infoObject.getInt("width");
@@ -110,7 +110,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     }
 
     @Override
-    public void bindCellHolder(final CellHolder cellHolder, ThreePartImageInfo info, final Message message, CellHolderSpecs specs) {
+    public void bindCellHolder(final CellHolder cellHolder, PreviewImageInfo info, final Message message, CellHolderSpecs specs) {
         // Get rotation and scaled dimensions
         final float rotation;
         final int[] cellDims;
@@ -231,7 +231,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     }
 
     /**
-     * Creates a new ThreePartImage Message.  The full image is attached untouched, while the
+     * Creates a new PreviewImage Message.  The full image is attached untouched, while the
      * preview is created from the full image by loading, resizing, and compressing.
      *
      * @param client
@@ -253,9 +253,15 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
         MessagePart full = client.newMessagePart("image/jpeg", new FileInputStream(file), file.length());
         MessagePart info = client.newMessagePart(MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
         MessagePart preview;
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            Log.v(TAG, "Creating PreviewImage from '" + file.getAbsolutePath() + "': " + new String(info.getData()));
+        }
 
         // Determine preview size
         int[] previewDim = scaleDownInside(fullWidth, fullHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT);
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            Log.v(TAG, "PreviewImage preview size: " + previewDim[0] + "x" + previewDim[1]);
+        }
 
         // Determine sample size for preview
         int sampleSize = 1;
@@ -266,9 +272,12 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
             sampleHeight >>= 1;
             sampleSize <<= 1;
         }
-        if (sampleSize != 1) sampleSize >>= 1;
+        if (sampleSize != 1) sampleSize >>= 1; // Back off 1 for scale-down instead of scale-up
         BitmapFactory.Options previewOptions = new BitmapFactory.Options();
         previewOptions.inSampleSize = sampleSize;
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            Log.v(TAG, "PreviewImage sampled size: " + (sampleWidth << 1) + "x" + (sampleHeight << 1));
+        }
 
         // Create low-quality preview
         Bitmap sampledBitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), previewOptions);
@@ -277,8 +286,11 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
         ByteArrayOutputStream previewStream = new ByteArrayOutputStream();
         previewBitmap.compress(Bitmap.CompressFormat.JPEG, PREVIEW_COMPRESSION_QUALITY, previewStream);
         previewBitmap.recycle();
-        preview = client.newMessagePart("image/jpeg" + MIME_PREVIEW_SUFFIX, previewStream.toByteArray());
+        preview = client.newMessagePart(MIME_PREVIEW, previewStream.toByteArray());
         previewStream.close();
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            Log.v(TAG, String.format(Locale.US, "PreviewImage full bytes: %d, preview bytes: %d, info bytes: %d", full.getSize(), preview.getSize(), info.getSize()));
+        }
 
         MessagePart[] parts = new MessagePart[3];
         parts[PART_INDEX_FULL] = full;
@@ -399,7 +411,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     /**
      * Parsed image metadata.
      */
-    static class ThreePartImageInfo implements AtlasCellFactory.ParsedContent {
+    static class PreviewImageInfo implements AtlasCellFactory.ParsedContent {
         public int orientation;
         public int width;
         public int height;

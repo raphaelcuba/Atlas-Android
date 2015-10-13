@@ -84,7 +84,7 @@ public class LocationCellFactory extends AtlasCellFactory<LocationCellFactory.Ce
                 .append("markers=color:red%7C").append(location.mLatitude).append(",").append(location.mLongitude)
                 .toString();
 
-        int[] cellDims = ThreePartImageCellFactory.scaleDownInside(specs.maxWidth, (int) Math.round((double) specs.maxWidth / GOLDEN_RATIO), specs.maxWidth, specs.maxHeight);
+        int[] cellDims = PreviewImageCellFactory.scaleDownInside(specs.maxWidth, (int) Math.round((double) specs.maxWidth / GOLDEN_RATIO), specs.maxWidth, specs.maxHeight);
         cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[0], cellDims[1]));
         mPicasso.load(url).tag(TAG).noFade().placeholder(PLACEHOLDER_RES_ID)
                 .resize(cellDims[0], cellDims[1])
