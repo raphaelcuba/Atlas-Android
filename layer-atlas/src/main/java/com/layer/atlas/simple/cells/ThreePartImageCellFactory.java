@@ -32,8 +32,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -60,9 +60,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     public static final int ORIENTATION_180 = 1;
     public static final int ORIENTATION_270 = 2;
 
-    private static final int COMPRESSION_QUALITY_FULL = 90;
-    private static final int COMPRESSION_QUALITY_PREVIEW = 50;
-
+    private static final int PREVIEW_COMPRESSION_QUALITY = 50;
     private static final int PREVIEW_MAX_WIDTH = 512;
     private static final int PREVIEW_MAX_HEIGHT = 512;
 
@@ -185,7 +183,17 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
         return message.getMessageParts().get(PART_INDEX_PREVIEW).getId();
     }
 
-    public static Message newThreePartMessage(LayerClient layerClient, File imageFile) {
+    public static Message newThreePartMessage(LayerClient layerClient, Context context, Uri imageUri) throws IOException {
+        Cursor cursor = context.getContentResolver().query(imageUri, new String[]{MediaStore.MediaColumns.DATA}, null, null, null);
+        try {
+            if (cursor == null || !cursor.moveToFirst()) return null;
+            return newThreePartMessage(layerClient, new File(cursor.getString(0)));
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+    }
+
+    public static Message newThreePartMessage(LayerClient layerClient, File imageFile) throws IOException {
         if (imageFile == null) throw new IllegalArgumentException("Null image file");
         if (!imageFile.exists()) throw new IllegalArgumentException("Image file does not exist");
         if (!imageFile.canRead()) throw new IllegalArgumentException("Cannot read image file");
@@ -219,98 +227,59 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
             Log.e(TAG, e.getMessage(), e);
         }
 
-        return newThreePartMessage(layerClient, orientation, BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
-    }
-
-    public static Message newThreePartMessage(LayerClient layerClient, Context context, Uri imageUri) throws IOException {
-        if (imageUri == null) throw new IllegalArgumentException("Null image Uri");
-
-        // Try getting the file so we can parse Exif orientiation.
-        try {
-            Cursor metaCursor = context.getContentResolver().query(imageUri, new String[]{MediaStore.MediaColumns.DATA}, null, null, null);
-            if (metaCursor != null) {
-                try {
-                    if (metaCursor.moveToFirst()) {
-                        return newThreePartMessage(layerClient, new File(metaCursor.getString(0)));
-                    }
-                } finally {
-                    metaCursor.close();
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-
-        // Fall back to default orientation.
-        InputStream inputStream = null;
-        try {
-            inputStream = context.getContentResolver().openInputStream(imageUri);
-            return newThreePartMessage(layerClient, ORIENTATION_0, BitmapFactory.decodeStream(inputStream));
-        } finally {
-            if (inputStream != null) inputStream.close();
-        }
+        return newThreePartMessage(layerClient, orientation, imageFile);
     }
 
     /**
-     * TODO: reduce memory.  Potentially only work with files.
+     * Creates a new ThreePartImage Message.  The full image is attached untouched, while the
+     * preview is created from the full image by loading, resizing, and compressing.
      *
      * @param client
-     * @param fullBitmap
+     * @param file   Image file
      * @return
      */
-    private static Message newThreePartMessage(LayerClient client, int orientation, Bitmap fullBitmap) {
+    private static Message newThreePartMessage(LayerClient client, int orientation, File file) throws IOException {
         if (client == null) throw new IllegalArgumentException("Null LayerClient");
-        if (fullBitmap == null) throw new IllegalArgumentException("Null Bitmap");
+        if (file == null) throw new IllegalArgumentException("Null image file");
+        if (!file.exists()) throw new IllegalArgumentException("No image file");
+        if (!file.canRead()) throw new IllegalArgumentException("Cannot read image file");
 
-        ByteArrayOutputStream fullStream = new ByteArrayOutputStream();
-        fullBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY_FULL, fullStream);
+        BitmapFactory.Options justBounds = new BitmapFactory.Options();
+        justBounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), justBounds);
 
-        boolean isResize;
-        int previewWidth = PREVIEW_MAX_WIDTH;
-        int previewHeight = PREVIEW_MAX_HEIGHT;
-        int fullWidth = fullBitmap.getWidth();
-        int fullHeight = fullBitmap.getHeight();
-        if (fullWidth <= PREVIEW_MAX_WIDTH && fullHeight <= PREVIEW_MAX_HEIGHT) {
-            isResize = false;
-        } else {
-            isResize = true;
-            double heightRatio = (double) fullHeight / (double) PREVIEW_MAX_HEIGHT;
-            double widthRatio = (double) fullWidth / (double) PREVIEW_MAX_WIDTH;
-            if (heightRatio > widthRatio) {
-                previewWidth = (int) Math.round((double) fullWidth / heightRatio);
-            } else {
-                previewHeight = (int) Math.round((double) fullHeight / widthRatio);
-            }
-        }
-
-        MessagePart full = client.newMessagePart("image/jpeg", fullStream.toByteArray());
+        int fullWidth = justBounds.outWidth;
+        int fullHeight = justBounds.outHeight;
+        MessagePart full = client.newMessagePart("image/jpeg", new FileInputStream(file), file.length());
         MessagePart info = client.newMessagePart(MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
         MessagePart preview;
-        if (!isResize) {
-            fullBitmap.recycle();
-            preview = client.newMessagePart("image/jpeg" + MIME_PREVIEW_SUFFIX, fullStream.toByteArray());
-            try {
-                fullStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                fullStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Bitmap previewBitmap = Bitmap.createScaledBitmap(fullBitmap, previewWidth, previewHeight, true);
-            fullBitmap.recycle();
-            ByteArrayOutputStream previewStream = new ByteArrayOutputStream();
-            previewBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY_PREVIEW, previewStream);
-            preview = client.newMessagePart("image/jpeg" + MIME_PREVIEW_SUFFIX, previewStream.toByteArray());
-            try {
-                previewStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+        // Determine preview size
+        int[] previewDim = scaleDownInside(fullWidth, fullHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT);
+
+        // Determine sample size for preview
+        int sampleSize = 1;
+        int sampleWidth = fullWidth;
+        int sampleHeight = fullHeight;
+        while (sampleWidth > previewDim[0] && sampleHeight > previewDim[1]) {
+            sampleWidth >>= 1;
+            sampleHeight >>= 1;
+            sampleSize <<= 1;
         }
+        if (sampleSize != 1) sampleSize >>= 1;
+        BitmapFactory.Options previewOptions = new BitmapFactory.Options();
+        previewOptions.inSampleSize = sampleSize;
+
+        // Create low-quality preview
+        Bitmap sampledBitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), previewOptions);
+        Bitmap previewBitmap = Bitmap.createScaledBitmap(sampledBitmap, previewDim[0], previewDim[1], false);
+        sampledBitmap.recycle();
+        ByteArrayOutputStream previewStream = new ByteArrayOutputStream();
+        previewBitmap.compress(Bitmap.CompressFormat.JPEG, PREVIEW_COMPRESSION_QUALITY, previewStream);
+        previewBitmap.recycle();
+        preview = client.newMessagePart("image/jpeg" + MIME_PREVIEW_SUFFIX, previewStream.toByteArray());
+        previewStream.close();
+
         MessagePart[] parts = new MessagePart[3];
         parts[PART_INDEX_FULL] = full;
         parts[PART_INDEX_PREVIEW] = preview;
@@ -341,10 +310,10 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
             double heightRatio = (double) inHeight / (double) maxHeight;
             if (widthRatio > heightRatio) {
                 scaledWidth = maxWidth;
-                scaledHeight = (int) Math.round((double) scaledWidth * (double) inHeight / (double) inWidth);
+                scaledHeight = (int) Math.round((double) inHeight / widthRatio);
             } else {
                 scaledHeight = maxHeight;
-                scaledWidth = (int) Math.round((double) scaledHeight * (double) inWidth / (double) inHeight);
+                scaledWidth = (int) Math.round((double) inWidth / heightRatio);
             }
         }
         return new int[]{scaledWidth, scaledHeight};
