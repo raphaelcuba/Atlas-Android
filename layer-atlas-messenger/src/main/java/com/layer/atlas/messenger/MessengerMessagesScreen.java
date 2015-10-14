@@ -126,7 +126,7 @@ public class MessengerMessagesScreen extends Activity {
         
         messageComposer = (AtlasMessageComposer) findViewById(R.id.atlas_screen_messages_message_composer);
         messageComposer.init(app.getLayerClient()).setConversation(conv);
-        messageComposer.setListener(new AtlasMessageComposer.Listener() {
+        messageComposer.setOnSendListener(new AtlasMessageComposer.Listener() {
             public boolean onBeforeSend(Message message) {
                 boolean conversationReady = ensureConversationReady();
                 if (!conversationReady) return false;

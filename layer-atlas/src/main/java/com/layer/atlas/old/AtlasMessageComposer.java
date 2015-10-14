@@ -44,8 +44,6 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 import com.layer.sdk.messaging.Conversation;
-import com.layer.sdk.messaging.Message;
-import com.layer.sdk.messaging.MessagePart;
 
 import java.util.ArrayList;
 
@@ -56,7 +54,7 @@ public class AtlasMessageComposer extends FrameLayout {
     private Button mSendButton;
     private ImageView mAttachButton;
 
-    private Listener mListener;
+    private OnSendClickListener mSendListener;
     private Conversation mConversation;
     private LayerClient mLayerClient;
 
@@ -175,7 +173,7 @@ public class AtlasMessageComposer extends FrameLayout {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (mConversation == null) return;
+                if (mConversation == null || mConversation.isDeleted()) return;
                 try {
                     if (s.length() > 0) {
                         mSendButton.setEnabled(isEnabled());
@@ -185,7 +183,7 @@ public class AtlasMessageComposer extends FrameLayout {
                         mConversation.send(LayerTypingIndicatorListener.TypingIndicator.FINISHED);
                     }
                 } catch (LayerException e) {
-                    // `e.getType() == LayerException.Type.CONVERSATION_DELETED`
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
         });
@@ -194,26 +192,13 @@ public class AtlasMessageComposer extends FrameLayout {
         mSendButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String text = mMessageText.getText().toString();
-
-                if (text.trim().length() > 0) {
-
-                    ArrayList<MessagePart> parts = new ArrayList<MessagePart>();
-                    String[] lines = text.split("\n+");
-                    for (String line : lines) {
-                        parts.add(mLayerClient.newMessagePart(line));
-                    }
-                    Message msg = mLayerClient.newMessage(parts);
-
-                    if (mListener != null) {
-                        boolean proceed = mListener.onBeforeSend(msg);
-                        if (!proceed) return;
-                    } else if (mConversation == null) {
-                        Log.e(TAG, "Cannot send message. Conversation is not set");
-                    }
-                    if (mConversation == null) return;
-
-                    mConversation.send(msg);
+                if (mSendListener == null) {
+                    Log.w(TAG, "No OnSendListener registered");
+                }
+                if (mSendListener.onSendClick(AtlasMessageComposer.this, mConversation, text)) {
+                    mConversation.send(LayerTypingIndicatorListener.TypingIndicator.FINISHED);
                     mMessageText.setText("");
+                    mSendButton.setEnabled(false);
                 }
             }
         });
@@ -246,8 +231,8 @@ public class AtlasMessageComposer extends FrameLayout {
         return this;
     }
 
-    public AtlasMessageComposer setListener(Listener listener) {
-        mListener = listener;
+    public AtlasMessageComposer setOnSendListener(OnSendClickListener listener) {
+        mSendListener = listener;
         return this;
     }
 
@@ -260,8 +245,8 @@ public class AtlasMessageComposer extends FrameLayout {
         return this;
     }
 
-    public interface Listener {
-        boolean onBeforeSend(Message message);
+    public interface OnSendClickListener {
+        boolean onSendClick(AtlasMessageComposer messageComposer, Conversation conversation, String text);
     }
 
     private static class AttachmentHandler {
