@@ -214,7 +214,7 @@ public class AtlasMessageComposer extends FrameLayout {
         return this;
     }
 
-    public AtlasMessageComposer registerAttachmentSender(AttachmentSender sender) {
+    public AtlasMessageComposer addAttachmentSender(AttachmentSender sender) {
         if (sender.getTitle() == null && sender.getIcon() == null) {
             throw new NullPointerException("Attachment handlers must have at least a title or icon specified.");
         }
