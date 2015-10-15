@@ -16,12 +16,14 @@
 package com.layer.atlas.old;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -39,7 +41,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.layer.atlas.ParticipantProvider;
 import com.layer.atlas.R;
+import com.layer.atlas.simple.messagesenders.AttachmentSender;
+import com.layer.atlas.simple.messagesenders.TextSender;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
@@ -54,11 +59,12 @@ public class AtlasMessageComposer extends FrameLayout {
     private Button mSendButton;
     private ImageView mAttachButton;
 
-    private OnSendClickListener mSendListener;
-    private Conversation mConversation;
     private LayerClient mLayerClient;
+    private ParticipantProvider mParticipantProvider;
+    private Conversation mConversation;
 
-    private ArrayList<AttachmentHandler> mAttachmentHandlers = new ArrayList<AttachmentHandler>();
+    private TextSender mTextSender;
+    private ArrayList<AttachmentSender> mAttachmentSenders = new ArrayList<AttachmentSender>();
 
     // styles
     private int mTextColor;
@@ -103,20 +109,12 @@ public class AtlasMessageComposer extends FrameLayout {
 
     /**
      * Initialization is required to engage MessageComposer with LayerClient.
-     *
-     * @param client - must be not null
      */
-    public AtlasMessageComposer init(LayerClient client) {
-        if (client == null) {
-            throw new IllegalArgumentException("LayerClient cannot be null");
-        }
-        if (mMessageText != null) {
-            throw new IllegalStateException("AtlasMessageComposer is already initialized!");
-        }
-
-        mLayerClient = client;
-
+    public AtlasMessageComposer init(LayerClient layerClient, ParticipantProvider participantProvider) {
         LayoutInflater.from(getContext()).inflate(R.layout.old_atlas_message_composer, this);
+
+        mLayerClient = layerClient;
+        mParticipantProvider = participantProvider;
 
         mAttachButton = (ImageView) findViewById(R.id.atlas_message_composer_upload);
         mAttachButton.setOnClickListener(new OnClickListener() {
@@ -127,23 +125,20 @@ public class AtlasMessageComposer extends FrameLayout {
                 LinearLayout menu = (LinearLayout) inflater.inflate(R.layout.old_atlas_view_message_composer_menu, null);
                 popupWindow.setContentView(menu);
 
-                for (AttachmentHandler item : mAttachmentHandlers) {
+                for (AttachmentSender sender : mAttachmentSenders) {
                     View itemConvert = inflater.inflate(R.layout.old_atlas_view_message_composer_menu_convert, menu, false);
                     TextView titleView = ((TextView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_title));
-                    titleView.setText(item.mTitle);
-                    itemConvert.setTag(item);
+                    titleView.setText(sender.getTitle());
+                    itemConvert.setTag(sender);
                     itemConvert.setOnClickListener(new OnClickListener() {
                         public void onClick(View v) {
                             popupWindow.dismiss();
-                            AttachmentHandler item = (AttachmentHandler) v.getTag();
-                            if (item.mClickListener != null) {
-                                item.mClickListener.onClick(v);
-                            }
+                            ((AttachmentSender) v.getTag()).send();
                         }
                     });
-                    if (item.mIcon != null) {
+                    if (sender.getIcon() != null) {
                         ImageView iconView = ((ImageView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_icon));
-                        iconView.setImageResource(item.mIcon);
+                        iconView.setImageResource(sender.getIcon());
                         iconView.setVisibility(VISIBLE);
                         Drawable d = DrawableCompat.wrap(iconView.getDrawable());
                         DrawableCompat.setTint(d, R.color.atlas_background_gray);
@@ -191,15 +186,9 @@ public class AtlasMessageComposer extends FrameLayout {
         mSendButton = (Button) findViewById(R.id.atlas_message_composer_send);
         mSendButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                String text = mMessageText.getText().toString();
-                if (mSendListener == null) {
-                    Log.w(TAG, "No OnSendListener registered");
-                }
-                if (mSendListener.onSendClick(AtlasMessageComposer.this, mConversation, text)) {
-                    mConversation.send(LayerTypingIndicatorListener.TypingIndicator.FINISHED);
-                    mMessageText.setText("");
-                    mSendButton.setEnabled(false);
-                }
+                if (!mTextSender.send(mMessageText.getText().toString())) return;
+                mMessageText.setText("");
+                mSendButton.setEnabled(false);
             }
         });
         applyStyle();
@@ -218,21 +207,21 @@ public class AtlasMessageComposer extends FrameLayout {
         mAttachButton.setImageDrawable(d);
     }
 
-    public AtlasMessageComposer registerAttachmentHandler(String title, Integer icon, OnClickListener clickListener) {
-        if (title == null && icon == null) {
-            throw new NullPointerException("Attachment handlers must have at least a title or icon specified.");
-        }
-        AttachmentHandler handler = new AttachmentHandler();
-        handler.mTitle = title;
-        handler.mIcon = icon;
-        handler.mClickListener = clickListener;
-        mAttachmentHandlers.add(handler);
-        mAttachButton.setVisibility(View.VISIBLE);
+    public AtlasMessageComposer setTextSender(TextSender textSender) {
+        mTextSender = textSender;
+        mTextSender.init(this.getContext().getApplicationContext(), mLayerClient, mParticipantProvider);
+        mTextSender.setConversation(mConversation);
         return this;
     }
 
-    public AtlasMessageComposer setOnSendListener(OnSendClickListener listener) {
-        mSendListener = listener;
+    public AtlasMessageComposer registerAttachmentSender(AttachmentSender sender) {
+        if (sender.getTitle() == null && sender.getIcon() == null) {
+            throw new NullPointerException("Attachment handlers must have at least a title or icon specified.");
+        }
+        sender.init(this.getContext().getApplicationContext(), mLayerClient, mParticipantProvider);
+        sender.setConversation(mConversation);
+        mAttachmentSenders.add(sender);
+        mAttachButton.setVisibility(View.VISIBLE);
         return this;
     }
 
@@ -240,18 +229,37 @@ public class AtlasMessageComposer extends FrameLayout {
         return mConversation;
     }
 
-    public AtlasMessageComposer setConversation(Conversation conv) {
-        mConversation = conv;
+    public AtlasMessageComposer setConversation(Conversation conversation) {
+        mConversation = conversation;
+        if (mTextSender != null) mTextSender.setConversation(conversation);
+        for (AttachmentSender sender : mAttachmentSenders) {
+            sender.setConversation(conversation);
+        }
         return this;
     }
 
-    public interface OnSendClickListener {
-        boolean onSendClick(AtlasMessageComposer messageComposer, Conversation conversation, String text);
+    public AtlasMessageComposer onCreate(Bundle savedInstanceState) {
+        if (savedInstanceState == null) return this;
+        mTextSender.onActivityCreate(savedInstanceState);
+        for (AttachmentSender sender : mAttachmentSenders) {
+            sender.onActivityCreate(savedInstanceState);
+        }
+        return this;
     }
 
-    private static class AttachmentHandler {
-        String mTitle;
-        Integer mIcon;
-        OnClickListener mClickListener;
+    public AtlasMessageComposer onSaveInstanceState(Bundle outState) {
+        mTextSender.onActivitySaveInstanceState(outState);
+        for (AttachmentSender sender : mAttachmentSenders) {
+            sender.onActivitySaveInstanceState(outState);
+        }
+        return this;
+    }
+
+    public AtlasMessageComposer onActivityResult(int requestCode, int resultCode, Intent data) {
+        mTextSender.onActivityResult(requestCode, resultCode, data);
+        for (AttachmentSender sender : mAttachmentSenders) {
+            sender.onActivityResult(requestCode, resultCode, data);
+        }
+        return this;
     }
 }

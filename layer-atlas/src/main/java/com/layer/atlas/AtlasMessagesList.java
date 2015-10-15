@@ -190,7 +190,8 @@ public class AtlasMessagesList extends RecyclerView {
         int end = mAdapter.getItemCount() - 1;
         if (end <= 0) return;
         int visible = findLastVisibleItemPosition();
-        if (visible >= (end - 1)) scrollToPosition(end);
+        // -3 because -1 seems too finicky
+        if (visible >= (end - 3)) scrollToPosition(end);
     }
 
     public void parseStyle(Context context, AttributeSet attrs, int defStyle) {

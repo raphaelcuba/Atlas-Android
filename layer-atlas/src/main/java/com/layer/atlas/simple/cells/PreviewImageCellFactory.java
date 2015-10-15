@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class PreviewImageCellFactory extends AtlasCellFactory<PreviewImageCellFactory.CellHolder, PreviewImageCellFactory.PreviewImageInfo> {
     public static final String TAG = PreviewImageCellFactory.class.getSimpleName();
+    public static final String TAG_FULL = PreviewImageCellFactory.class.getSimpleName() + ".full";
 
     private static final int PLACEHOLDER_RES_ID = R.drawable.atlas_message_item_cell_placeholder;
 
@@ -137,12 +138,12 @@ public class PreviewImageCellFactory extends AtlasCellFactory<PreviewImageCellFa
                 break;
         }
 
-        if (isFullImageReady(message)) {
-            // Full image is ready, load it directly.
-            mPicasso.load(getFullImageId(message)).tag(TAG).placeholder(PLACEHOLDER_RES_ID)
-                    .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
-                    .transform(mTransform).into(cellHolder.mImageView);
-        } else {
+//        if (isFullImageReady(message)) {
+//            // Full image is ready, load it directly.
+//            mPicasso.load(getFullImageId(message)).tag(TAG_FULL).placeholder(PLACEHOLDER_RES_ID)
+//                    .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
+//                    .transform(mTransform).into(cellHolder.mImageView);
+//        } else {
             // Full image is not ready, so start by loading the preview...
             mPicasso.load(getPreviewImageId(message)).tag(TAG).placeholder(PLACEHOLDER_RES_ID)
                     .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
@@ -150,7 +151,7 @@ public class PreviewImageCellFactory extends AtlasCellFactory<PreviewImageCellFa
                 @Override
                 public void onSuccess() {
                     // ...Then load in the full image.
-                    mPicasso.load(getFullImageId(message)).tag(TAG).noPlaceholder()
+                    mPicasso.load(getFullImageId(message)).tag(TAG_FULL).noPlaceholder()
                             .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
                             .transform(mTransform).into(cellHolder.mImageView);
                 }
@@ -159,7 +160,7 @@ public class PreviewImageCellFactory extends AtlasCellFactory<PreviewImageCellFa
                 public void onError() {
                 }
             });
-        }
+//        }
     }
 
 

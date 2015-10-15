@@ -23,4 +23,8 @@
         <item>Many people are typing…</item>
     </string-array>
 
+    <string name="atlas_notification_text">%1$s: %2$s</string>
+    <string name="atlas_notification_image">Attachment from %1$s: Image</string>
+    <string name="atlas_notification_location">Attachment from %1$s: Location</string>
+
 </resources>

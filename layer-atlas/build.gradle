@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'com.layer.sdk', name: 'layer-sdk', version: "0.18.0") {
+    compile(group: 'com.layer.sdk', name: 'layer-sdk', version: "0.18.1") {
     }
 
     compile 'com.squareup.picasso:picasso:2.5.2'

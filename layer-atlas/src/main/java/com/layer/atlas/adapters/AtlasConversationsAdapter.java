@@ -1,6 +1,7 @@
 package com.layer.atlas.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -153,6 +154,7 @@ public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConvers
             viewHolder.mTimeView.setText(null);
         } else {
             viewHolder.mMessageView.setText(Utils.Tools.toString(lastMessage));
+            viewHolder.mTitleView.setTypeface(null, (viewHolder.mConversation.getTotalUnreadMessageCount() > 0)? Typeface.BOLD : Typeface.NORMAL);
             if (lastMessage.getSentAt() == null) {
                 viewHolder.mTimeView.setText(null);
             } else {
