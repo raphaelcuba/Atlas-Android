@@ -86,6 +86,15 @@ public class AtlasMessagesList extends RecyclerView {
                 });
         super.setAdapter(mAdapter);
 
+        addOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                for (AtlasCellFactory factory : mAdapter.getCellFactories()) {
+                    factory.onScrollStateChanged(newState);
+                }
+            }
+        });
+
         return this;
     }
 
@@ -147,10 +156,10 @@ public class AtlasMessagesList extends RecyclerView {
     /**
      * Convenience pass-through to this list's AtlasMessagesAdapter.
      *
-     * @see AtlasMessagesAdapter#registerCellFactories(AtlasCellFactory...)
+     * @see AtlasMessagesAdapter#addCellFactories(AtlasCellFactory...)
      */
-    public AtlasMessagesList registerCellFactories(AtlasCellFactory... cellFactories) {
-        mAdapter.registerCellFactories(cellFactories);
+    public AtlasMessagesList addCellFactories(AtlasCellFactory... cellFactories) {
+        mAdapter.addCellFactories(cellFactories);
         return this;
     }
 
@@ -193,6 +202,7 @@ public class AtlasMessagesList extends RecyclerView {
         // -3 because -1 seems too finicky
         if (visible >= (end - 3)) scrollToPosition(end);
     }
+
 
     public void parseStyle(Context context, AttributeSet attrs, int defStyle) {
         TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AtlasMessagesList, R.attr.AtlasMessageList, defStyle);

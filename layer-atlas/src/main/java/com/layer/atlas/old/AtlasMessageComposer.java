@@ -43,8 +43,8 @@ import android.widget.TextView;
 
 import com.layer.atlas.ParticipantProvider;
 import com.layer.atlas.R;
-import com.layer.atlas.simple.messagesenders.AttachmentSender;
-import com.layer.atlas.simple.messagesenders.TextSender;
+import com.layer.atlas.messages.AttachmentSender;
+import com.layer.atlas.messages.TextSender;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
@@ -214,14 +214,16 @@ public class AtlasMessageComposer extends FrameLayout {
         return this;
     }
 
-    public AtlasMessageComposer addAttachmentSender(AttachmentSender sender) {
-        if (sender.getTitle() == null && sender.getIcon() == null) {
-            throw new NullPointerException("Attachment handlers must have at least a title or icon specified.");
+    public AtlasMessageComposer addAttachmentSenders(AttachmentSender... senders) {
+        for (AttachmentSender sender : senders) {
+            if (sender.getTitle() == null && sender.getIcon() == null) {
+                throw new NullPointerException("Attachment handlers must have at least a title or icon specified.");
+            }
+            sender.init(this.getContext().getApplicationContext(), mLayerClient, mParticipantProvider);
+            sender.setConversation(mConversation);
+            mAttachmentSenders.add(sender);
         }
-        sender.init(this.getContext().getApplicationContext(), mLayerClient, mParticipantProvider);
-        sender.setConversation(mConversation);
-        mAttachmentSenders.add(sender);
-        mAttachButton.setVisibility(View.VISIBLE);
+        if (!mAttachmentSenders.isEmpty()) mAttachButton.setVisibility(View.VISIBLE);
         return this;
     }
 

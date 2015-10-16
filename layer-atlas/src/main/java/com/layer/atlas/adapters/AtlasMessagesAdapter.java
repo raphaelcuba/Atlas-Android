@@ -211,7 +211,7 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
      * @param cellFactories Cells to register.
      * @return This AtlasMessagesAdapter.
      */
-    public AtlasMessagesAdapter registerCellFactories(AtlasCellFactory... cellFactories) {
+    public AtlasMessagesAdapter addCellFactories(AtlasCellFactory... cellFactories) {
         for (AtlasCellFactory CellFactory : cellFactories) {
             mCellFactories.add(CellFactory);
 
@@ -226,6 +226,10 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
             mTheirViewTypesByCell.put(CellFactory, mViewTypeCount);
         }
         return this;
+    }
+
+    public Set<AtlasCellFactory> getCellFactories() {
+        return mCellFactories;
     }
 
     @Override

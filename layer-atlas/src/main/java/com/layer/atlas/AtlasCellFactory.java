@@ -1,5 +1,6 @@
 package com.layer.atlas;
 
+import android.support.v7.widget.RecyclerView;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +64,18 @@ public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHold
      * @param specs      Information about the CellHolder.
      */
     public abstract void bindCellHolder(Tholder cellHolder, Tcache cached, Message message, CellHolderSpecs specs);
+
+    /**
+     * Override to handle RecyclerView scrolling.  Example: pause and resume Picasso loads.
+     *
+     * @param newState Scroll state of the RecyclerView.
+     * @see RecyclerView#SCROLL_STATE_IDLE
+     * @see RecyclerView#SCROLL_STATE_DRAGGING
+     * @see RecyclerView#SCROLL_STATE_SETTLING
+     */
+    public void onScrollStateChanged(int newState) {
+
+    }
 
     /**
      * Returns previously parsed content for this Message, or calls parseContent() if it has not
