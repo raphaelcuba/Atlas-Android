@@ -1,5 +1,6 @@
 package com.layer.atlas.messages;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -31,15 +33,21 @@ public class Location {
     private static GoogleApiClient sGoogleApiClient;
     private static final String MIME_TYPE = "location/coordinate";
 
-    public static void init(Context context) {
+    public static void init(Activity activity, int requestCode) {
         if (sGoogleApiClient != null) return;
-        GoogleApiCallbacks googleApiCallbacks = new GoogleApiCallbacks();
-        sGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(googleApiCallbacks)
-                .addOnConnectionFailedListener(googleApiCallbacks)
-                .addApi(LocationServices.API)
-                .build();
-        connectGoogleApi();
+
+        int errorCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity);
+        if (errorCode != ConnectionResult.SUCCESS) {
+            GoogleApiAvailability.getInstance().getErrorDialog(activity, errorCode, requestCode).show();
+        } else {
+            GoogleApiCallbacks googleApiCallbacks = new GoogleApiCallbacks();
+            sGoogleApiClient = new GoogleApiClient.Builder(activity)
+                    .addConnectionCallbacks(googleApiCallbacks)
+                    .addOnConnectionFailedListener(googleApiCallbacks)
+                    .addApi(LocationServices.API)
+                    .build();
+            connectGoogleApi();
+        }
     }
 
     public static void connectGoogleApi() {
@@ -56,7 +64,11 @@ public class Location {
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setExpirationDuration(10000)
                 .setMaxWaitTime(10000);
-        LocationServices.FusedLocationApi.requestLocationUpdates(sGoogleApiClient, r, listener);
+        try {
+            LocationServices.FusedLocationApi.requestLocationUpdates(sGoogleApiClient, r, listener);
+        } catch (IllegalStateException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     public static class CellFactory extends AtlasCellFactory<CellFactory.CellHolder, CellFactory.ParsedContent> {
