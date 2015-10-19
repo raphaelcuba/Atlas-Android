@@ -77,6 +77,14 @@ public abstract class AtlasCellFactory<Tholder extends AtlasCellFactory.CellHold
 
     }
 
+    public boolean onMessageClick(Message message) {
+        return false;
+    }
+
+    public boolean onMessageLongClick(Message message) {
+        return false;
+    }
+
     /**
      * Returns previously parsed content for this Message, or calls parseContent() if it has not
      * been previously parsed.

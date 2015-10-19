@@ -59,7 +59,7 @@
         <!-- separator: 1px line -->
         <View android:layout_width="match_parent" android:layout_height="1px" android:background="@color/atlas_background_gray"/>
         
-        <com.layer.atlas.old.AtlasMessageComposer
+        <com.layer.atlas.AtlasMessageComposer
             android:id="@+id/atlas_screen_messages_message_composer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

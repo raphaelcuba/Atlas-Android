@@ -43,7 +43,7 @@ public class BasicImage {
 
         @Override
         public CellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
-            return new CellHolder(layoutInflater.inflate(R.layout.cell_image, cellView, true));
+            return new CellHolder(layoutInflater.inflate(R.layout.atlas_message_item_cell_image, cellView, true));
         }
 
         @Override

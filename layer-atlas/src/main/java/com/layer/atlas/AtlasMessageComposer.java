@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.layer.atlas.old;
+package com.layer.atlas;
 
 import android.content.Context;
 import android.content.Intent;
@@ -41,8 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.layer.atlas.ParticipantProvider;
-import com.layer.atlas.R;
 import com.layer.atlas.messages.AttachmentSender;
 import com.layer.atlas.messages.TextSender;
 import com.layer.sdk.LayerClient;
@@ -111,7 +109,7 @@ public class AtlasMessageComposer extends FrameLayout {
      * Initialization is required to engage MessageComposer with LayerClient.
      */
     public AtlasMessageComposer init(LayerClient layerClient, ParticipantProvider participantProvider) {
-        LayoutInflater.from(getContext()).inflate(R.layout.old_atlas_message_composer, this);
+        LayoutInflater.from(getContext()).inflate(R.layout.atlas_message_composer, this);
 
         mLayerClient = layerClient;
         mParticipantProvider = participantProvider;
@@ -122,11 +120,11 @@ public class AtlasMessageComposer extends FrameLayout {
                 final PopupWindow popupWindow = new PopupWindow(v.getContext());
                 popupWindow.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 LayoutInflater inflater = LayoutInflater.from(v.getContext());
-                LinearLayout menu = (LinearLayout) inflater.inflate(R.layout.old_atlas_view_message_composer_menu, null);
+                LinearLayout menu = (LinearLayout) inflater.inflate(R.layout.atlas_message_composer_attachment_menu, null);
                 popupWindow.setContentView(menu);
 
                 for (AttachmentSender sender : mAttachmentSenders) {
-                    View itemConvert = inflater.inflate(R.layout.old_atlas_view_message_composer_menu_convert, menu, false);
+                    View itemConvert = inflater.inflate(R.layout.atlas_message_composer_attachment_menu_item, menu, false);
                     TextView titleView = ((TextView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_title));
                     titleView.setText(sender.getTitle());
                     itemConvert.setTag(sender);

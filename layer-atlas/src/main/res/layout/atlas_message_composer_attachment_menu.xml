@@ -21,9 +21,4 @@
               android:paddingBottom="8dp"
               android:background="@drawable/atlas_ctl_popup_background"
     >
-    <!-- 
-    <include layout="@layout/atlas_view_message_composer_menu_convert"/>
-    <include layout="@layout/atlas_view_message_composer_menu_convert"/>
-    <include layout="@layout/atlas_view_message_composer_menu_convert"/>
-     -->
 </LinearLayout>

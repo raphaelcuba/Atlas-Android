@@ -26,7 +26,7 @@ public class Mime {
 
         @Override
         public CellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
-            return new CellHolder(layoutInflater.inflate(R.layout.cell_text, cellView));
+            return new CellHolder(layoutInflater.inflate(R.layout.atlas_message_item_cell_text, cellView));
         }
 
         @Override

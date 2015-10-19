@@ -260,7 +260,7 @@ public class ThreePartImage {
 
         @Override
         public CellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
-            return new CellHolder(layoutInflater.inflate(R.layout.cell_image, cellView, true));
+            return new CellHolder(layoutInflater.inflate(R.layout.atlas_message_item_cell_image, cellView, true));
         }
 
         @Override
@@ -306,19 +306,12 @@ public class ThreePartImage {
                     break;
             }
 
-//        if (isFullImageReady(message)) {
-//            // Full image is ready, load it directly.
-//            mPicasso.load(getFullImageId(message)).tag(TAG_FULL).placeholder(PLACEHOLDER_RES_ID)
-//                    .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
-//                    .transform(mTransform).into(cellHolder.mImageView);
-//        } else {
-            // Full image is not ready, so start by loading the preview...
+            // Load preview, followed by full image
             mPicasso.load(getPreviewImageId(message)).tag(TAG).placeholder(PLACEHOLDER_RES_ID)
                     .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
                     .transform(mTransform).into(cellHolder.mImageView, new Callback() {
                 @Override
                 public void onSuccess() {
-                    // ...Then load in the full image.
                     mPicasso.load(getFullImageId(message)).tag(TAG_FULL).noPlaceholder()
                             .noFade().centerCrop().resize(cellDims[0], cellDims[1]).rotate(rotation)
                             .transform(mTransform).into(cellHolder.mImageView);
@@ -326,9 +319,9 @@ public class ThreePartImage {
 
                 @Override
                 public void onError() {
+                    Log.e(TAG, "Failed to load preview image for: " + message);
                 }
             });
-//        }
         }
 
         @Override
