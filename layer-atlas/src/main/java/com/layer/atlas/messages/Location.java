@@ -2,6 +2,7 @@ package com.layer.atlas.messages;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,15 +31,20 @@ import org.json.JSONObject;
 
 public class Location {
     private static final String TAG = Location.class.getSimpleName();
-    private static GoogleApiClient sGoogleApiClient;
+    private static final int GOOGLE_API_REQUEST_CODE = 47000;
     private static final String MIME_TYPE = "location/coordinate";
 
-    public static void init(Activity activity, int requestCode) {
-        if (sGoogleApiClient != null) return;
+    private static GoogleApiClient sGoogleApiClient;
+
+    public static void init(Activity activity) {
+        if (sGoogleApiClient != null) {
+            if (!sGoogleApiClient.isConnected()) sGoogleApiClient.connect();
+            return;
+        }
 
         int errorCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity);
         if (errorCode != ConnectionResult.SUCCESS) {
-            GoogleApiAvailability.getInstance().getErrorDialog(activity, errorCode, requestCode).show();
+            GoogleApiAvailability.getInstance().getErrorDialog(activity, errorCode, GOOGLE_API_REQUEST_CODE).show();
         } else {
             GoogleApiCallbacks googleApiCallbacks = new GoogleApiCallbacks();
             sGoogleApiClient = new GoogleApiClient.Builder(activity)
@@ -48,6 +54,12 @@ public class Location {
                     .build();
             connectGoogleApi();
         }
+    }
+
+    public static boolean onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if (requestCode != GOOGLE_API_REQUEST_CODE) return false;
+        Location.init(activity);
+        return true;
     }
 
     public static void connectGoogleApi() {
