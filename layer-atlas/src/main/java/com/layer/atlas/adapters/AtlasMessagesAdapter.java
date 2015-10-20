@@ -72,9 +72,6 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
     protected OnMessageAppendListener mAppendListener;
     protected final DisplayMetrics mDisplayMetrics;
 
-    protected OnMessageClickListener mMessageClickListener;
-    protected AtlasCellFactory.CellHolder.OnClickListener mCellHolderClickListener;
-
     // Cells
     protected int mViewTypeCount = VIEW_TYPE_FOOTER;
     protected final Set<AtlasCellFactory> mCellFactories = new LinkedHashSet<AtlasCellFactory>();
@@ -115,19 +112,6 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         mUiThreadHandler = new Handler(Looper.getMainLooper());
         mDateFormat = android.text.format.DateFormat.getDateFormat(context);
         mTimeFormat = android.text.format.DateFormat.getTimeFormat(context);
-        mCellHolderClickListener = new AtlasCellFactory.CellHolder.OnClickListener() {
-            @Override
-            public void onClick(AtlasCellFactory.CellHolder cellHolder) {
-                if (mMessageClickListener == null) return;
-                mMessageClickListener.onMessageClick(AtlasMessagesAdapter.this, cellHolder.getMessage());
-            }
-
-            @Override
-            public boolean onLongClick(AtlasCellFactory.CellHolder cellHolder) {
-                if (mMessageClickListener == null) return false;
-                return mMessageClickListener.onMessageLongClick(AtlasMessagesAdapter.this, cellHolder.getMessage());
-            }
-        };
         mDisplayMetrics = context.getResources().getDisplayMetrics();
         setHasStableIds(false);
     }
@@ -194,11 +178,6 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         return this;
     }
 
-    public AtlasMessagesAdapter setOnItemClickListener(OnMessageClickListener listener) {
-        mMessageClickListener = listener;
-        return this;
-    }
-
 
     //==============================================================================================
     // Adapter and Cells
@@ -254,8 +233,6 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         int rootResId = cellType.mMe ? CellViewHolder.RESOURCE_ID_ME : CellViewHolder.RESOURCE_ID_THEM;
         CellViewHolder rootViewHolder = new CellViewHolder(mLayoutInflater.inflate(rootResId, parent, false), mParticipantProvider, mPicasso);
         AtlasCellFactory.CellHolder cellHolder = cellType.mCellFactory.createCellHolder(rootViewHolder.mCell, cellType.mMe, mLayoutInflater);
-        cellHolder.setClickableView(rootViewHolder.itemView);
-        cellHolder.setClickListener(mCellHolderClickListener);
         rootViewHolder.mCellHolder = cellHolder;
         rootViewHolder.mCellHolderSpecs = new AtlasCellFactory.CellHolderSpecs();
         return rootViewHolder;
@@ -725,11 +702,4 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
          */
         void onMessageAppend(AtlasMessagesAdapter adapter, Message message);
     }
-
-    public interface OnMessageClickListener {
-        void onMessageClick(AtlasMessagesAdapter adapter, Message message);
-
-        boolean onMessageLongClick(AtlasMessagesAdapter adapter, Message message);
-    }
-
 }

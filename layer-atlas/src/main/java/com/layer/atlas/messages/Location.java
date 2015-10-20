@@ -3,6 +3,7 @@ package com.layer.atlas.messages;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,6 +29,8 @@ import com.squareup.picasso.Transformation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.URLEncoder;
 
 public class Location {
     private static final String TAG = Location.class.getSimpleName();
@@ -113,8 +116,9 @@ public class Location {
             try {
                 JSONObject o = new JSONObject(new String(message.getMessageParts().get(0).getData()));
                 ParsedContent c = new ParsedContent();
-                c.mLatitude = o.getDouble("lat");
-                c.mLongitude = o.getDouble("lon");
+                c.mLatitude = o.optDouble("lat", 0);
+                c.mLongitude = o.optDouble("lon", 0);
+                c.mLabel = o.optString("label", null);
                 return c;
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -123,7 +127,7 @@ public class Location {
         }
 
         @Override
-        public void bindCellHolder(CellHolder cellHolder, ParsedContent location, Message message, CellHolderSpecs specs) {
+        public void bindCellHolder(final CellHolder cellHolder, final ParsedContent location, Message message, CellHolderSpecs specs) {
             // Google Static Map API has max dimension 640
             int mapWidth = Math.min(640, specs.maxWidth);
             int mapHeight = (int) Math.round((double) mapWidth / GOLDEN_RATIO);
@@ -134,11 +138,20 @@ public class Location {
                     .append("markers=color:red%7C").append(location.mLatitude).append(",").append(location.mLongitude)
                     .toString();
 
-            int[] cellDims = ThreePartImage.scaleDownInside(specs.maxWidth, (int) Math.round((double) specs.maxWidth / GOLDEN_RATIO), specs.maxWidth, specs.maxHeight);
+            final int[] cellDims = ThreePartImage.scaleDownInside(specs.maxWidth, (int) Math.round((double) specs.maxWidth / GOLDEN_RATIO), specs.maxWidth, specs.maxHeight);
             cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[0], cellDims[1]));
             mPicasso.load(url).tag(TAG).noFade().placeholder(PLACEHOLDER_RES_ID)
                     .resize(cellDims[0], cellDims[1])
                     .centerCrop().transform(mTransform).into(cellHolder.mImageView);
+
+            cellHolder.mImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String encodedLabel = (location.mLabel == null) ? URLEncoder.encode("Shared Marker") : URLEncoder.encode(location.mLabel);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + location.mLatitude + "," + location.mLongitude + "(" + encodedLabel + ")&z=16"));
+                    cellHolder.mImageView.getContext().startActivity(intent);
+                }
+            });
         }
 
         @Override
@@ -154,19 +167,14 @@ public class Location {
             }
         }
 
-        @Override
-        public boolean onMessageClick(Message message) {
-
-            return true;
-        }
-
         static class ParsedContent implements AtlasCellFactory.ParsedContent {
             double mLatitude;
             double mLongitude;
+            String mLabel;
 
             @Override
             public int sizeOf() {
-                return (Double.SIZE + Double.SIZE) / Byte.SIZE;
+                return (mLabel == null ? 0 : mLabel.getBytes().length) + ((Double.SIZE + Double.SIZE) / Byte.SIZE);
             }
         }
 
@@ -192,10 +200,18 @@ public class Location {
                 @Override
                 public void onLocationChanged(android.location.Location location) {
                     String myName = getParticipantProvider().getParticipant(getLayerClient().getAuthenticatedUserId()).getName();
-                    MessagePart p = getLayerClient().newMessagePart(MIME_TYPE, ("{\"lat\":" + location.getLatitude() + ",\"lon\":" + location.getLongitude() + "}").getBytes());
-                    Message message = getLayerClient().newMessage(p);
-                    message.getOptions().pushNotificationMessage(getContext().getString(R.string.atlas_notification_location, myName));
-                    getConversation().send(message);
+                    try {
+                        JSONObject o = new JSONObject()
+                                .put("lat", location.getLatitude())
+                                .put("lon", location.getLongitude())
+                                .put("label", myName);
+                        MessagePart p = getLayerClient().newMessagePart(MIME_TYPE, o.toString().getBytes());
+                        Message message = getLayerClient().newMessage(p);
+                        message.getOptions().pushNotificationMessage(getContext().getString(R.string.atlas_notification_location, myName));
+                        getConversation().send(message);
+                    } catch (JSONException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    }
                 }
             });
             return true;

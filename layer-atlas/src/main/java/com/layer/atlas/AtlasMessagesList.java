@@ -129,16 +129,6 @@ public class AtlasMessagesList extends RecyclerView {
         return this;
     }
 
-    /**
-     * Convenience pass-through to this list's AtlasMessagesAdapter.
-     *
-     * @see AtlasMessagesAdapter#setOnItemClickListener(AtlasMessagesAdapter.OnMessageClickListener)
-     */
-    public AtlasMessagesList setOnMessageClickListener(AtlasMessagesAdapter.OnMessageClickListener listener) {
-        mAdapter.setOnItemClickListener(listener);
-        return this;
-    }
-
     public AtlasMessagesList setOnMessageSwipeListener(AtlasMessagesList.OnMessageSwipeListener listener) {
         if (mSwipeItemTouchHelper != null) {
             mSwipeItemTouchHelper.attachToRecyclerView(null);
