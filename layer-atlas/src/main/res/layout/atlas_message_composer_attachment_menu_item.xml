@@ -16,31 +16,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="48dp"
-              android:background="@drawable/atlas_ctl_menu_item_background"
               android:orientation="horizontal"
-              android:paddingLeft="16dp"
-              android:paddingRight="16dp"
     >
 
-    <!-- avatar placeholder -->
     <ImageView
-        android:id="@+id/altas_view_message_composer_convert_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginRight="8dp"
         android:gravity="center"
         android:visibility="gone"
+        android:scaleType="center"
         />
 
     <TextView
-        android:id="@+id/altas_view_message_composer_convert_title"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Item"
-        android:textColor="@color/atlas_text_black87"
+        android:textColor="@color/atlas_text_black"
         android:textSize="@dimen/atlas_text_size_general"
+        android:paddingLeft="16dp"
         />
 
 </LinearLayout>

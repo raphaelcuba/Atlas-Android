@@ -361,7 +361,7 @@ public class ThreePartImage {
 
     public static class CameraSender extends AttachmentSender {
         private static final String TAG = CameraSender.class.getSimpleName();
-        public static final int REQUEST_CODE = 47001;
+        public static final int REQUEST_CODE = 47002;
 
         private final WeakReference<Activity> mActivity;
         private final AtomicReference<String> mPhotoFilePath = new AtomicReference<String>(null);
@@ -421,7 +421,7 @@ public class ThreePartImage {
 
     public static class GallerySender extends AttachmentSender {
         private static final String TAG = GallerySender.class.getSimpleName();
-        public static final int REQUEST_CODE = 47000;
+        public static final int REQUEST_CODE = 47001;
 
         private final WeakReference<Activity> mActivity;
 

@@ -19,9 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -29,7 +27,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +61,8 @@ public class AtlasMessageComposer extends FrameLayout {
     private TextSender mTextSender;
     private ArrayList<AttachmentSender> mAttachmentSenders = new ArrayList<AttachmentSender>();
 
+    private PopupWindow mAttachmentMenu;
+
     // styles
     private int mTextColor;
     private float mTextSize;
@@ -71,17 +70,32 @@ public class AtlasMessageComposer extends FrameLayout {
     private int mTextStyle;
     private boolean mEnabled;
 
-    public AtlasMessageComposer(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        parseStyle(context, attrs, defStyle);
+    public AtlasMessageComposer(Context context) {
+        super(context);
+        initMenu(context, null, 0);
     }
 
     public AtlasMessageComposer(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AtlasMessageComposer(Context context) {
-        super(context);
+    public AtlasMessageComposer(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        parseStyle(context, attrs, defStyle);
+        initMenu(context, attrs, defStyle);
+    }
+
+    private void initMenu(Context context, AttributeSet attrs, int defStyle) {
+        if (mAttachmentMenu != null) throw new IllegalStateException("Already initialized menu");
+
+        if (attrs == null) {
+            mAttachmentMenu = new PopupWindow(context);
+        } else {
+            mAttachmentMenu = new PopupWindow(context, attrs, defStyle);
+        }
+        mAttachmentMenu.setContentView(LayoutInflater.from(context).inflate(R.layout.atlas_message_composer_attachment_menu, null));
+        mAttachmentMenu.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mAttachmentMenu.setOutsideTouchable(true);
     }
 
     public void parseStyle(Context context, AttributeSet attrs, int defStyle) {
@@ -105,6 +119,29 @@ public class AtlasMessageComposer extends FrameLayout {
         super.setEnabled(enabled);
     }
 
+    private void addMenuItem(AttachmentSender sender) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LinearLayout menuLayout = (LinearLayout) mAttachmentMenu.getContentView();
+
+        View menuItem = inflater.inflate(R.layout.atlas_message_composer_attachment_menu_item, menuLayout, false);
+        ((TextView) menuItem.findViewById(R.id.title)).setText(sender.getTitle());
+        menuItem.setTag(sender);
+        menuItem.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mAttachmentMenu.dismiss();
+                ((AttachmentSender) v.getTag()).send();
+            }
+        });
+        if (sender.getIcon() != null) {
+            ImageView iconView = ((ImageView) menuItem.findViewById(R.id.icon));
+            iconView.setImageResource(sender.getIcon());
+            iconView.setVisibility(VISIBLE);
+            Drawable d = DrawableCompat.wrap(iconView.getDrawable());
+            DrawableCompat.setTint(d, getResources().getColor(R.color.atlas_icon_gray));
+        }
+        menuLayout.addView(menuItem);
+    }
+
     /**
      * Initialization is required to engage MessageComposer with LayerClient.
      */
@@ -117,40 +154,9 @@ public class AtlasMessageComposer extends FrameLayout {
         mAttachButton = (ImageView) findViewById(R.id.atlas_message_composer_upload);
         mAttachButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                final PopupWindow popupWindow = new PopupWindow(v.getContext());
-                popupWindow.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                LayoutInflater inflater = LayoutInflater.from(v.getContext());
-                LinearLayout menu = (LinearLayout) inflater.inflate(R.layout.atlas_message_composer_attachment_menu, null);
-                popupWindow.setContentView(menu);
-
-                for (AttachmentSender sender : mAttachmentSenders) {
-                    View itemConvert = inflater.inflate(R.layout.atlas_message_composer_attachment_menu_item, menu, false);
-                    TextView titleView = ((TextView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_title));
-                    titleView.setText(sender.getTitle());
-                    itemConvert.setTag(sender);
-                    itemConvert.setOnClickListener(new OnClickListener() {
-                        public void onClick(View v) {
-                            popupWindow.dismiss();
-                            ((AttachmentSender) v.getTag()).send();
-                        }
-                    });
-                    if (sender.getIcon() != null) {
-                        ImageView iconView = ((ImageView) itemConvert.findViewById(R.id.altas_view_message_composer_convert_icon));
-                        iconView.setImageResource(sender.getIcon());
-                        iconView.setVisibility(VISIBLE);
-                        Drawable d = DrawableCompat.wrap(iconView.getDrawable());
-                        DrawableCompat.setTint(d, R.color.atlas_background_gray);
-                    }
-                    menu.addView(itemConvert);
-                }
-                popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                popupWindow.setOutsideTouchable(true);
-                int[] viewXYWindow = new int[2];
-                v.getLocationInWindow(viewXYWindow);
-
+                LinearLayout menu = (LinearLayout) mAttachmentMenu.getContentView();
                 menu.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-                int menuHeight = menu.getMeasuredHeight();
-                popupWindow.showAtLocation(v, Gravity.NO_GRAVITY, viewXYWindow[0], viewXYWindow[1] - menuHeight);
+                mAttachmentMenu.showAsDropDown(v, 0, -menu.getMeasuredHeight() - v.getHeight());
             }
         });
 
@@ -220,6 +226,7 @@ public class AtlasMessageComposer extends FrameLayout {
             sender.init(this.getContext().getApplicationContext(), mLayerClient, mParticipantProvider);
             sender.setConversation(mConversation);
             mAttachmentSenders.add(sender);
+            addMenuItem(sender);
         }
         if (!mAttachmentSenders.isEmpty()) mAttachButton.setVisibility(View.VISIBLE);
         return this;

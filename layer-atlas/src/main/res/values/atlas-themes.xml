@@ -23,6 +23,7 @@
         <item name="actionOverflowButtonStyle">@style/AtlasActionBarOverflowButton</item>
 
         <item name="android:windowBackground">@color/atlas_background_white</item>
+        <item name="android:popupBackground">@drawable/atlas_popup_background</item>
     </style>
 
     <style name="Theme.Atlas.Light" parent="Theme.Atlas.Base.Light">
