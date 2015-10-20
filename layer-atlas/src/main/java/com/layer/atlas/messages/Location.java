@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -31,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Location {
     private static final String TAG = Location.class.getSimpleName();
@@ -38,17 +40,26 @@ public class Location {
     private static final String MIME_TYPE = "location/coordinate";
 
     private static GoogleApiClient sGoogleApiClient;
+    private static AtomicInteger sTryCount = new AtomicInteger(3);
 
-    public static void init(Activity activity) {
+
+    public static void init(final Activity activity) {
+        if (sTryCount.decrementAndGet() <= 0) {
+            Log.e(TAG, "Giving up updating Google Play Services.");
+            return;
+        }
+
+        // If the client has already been created, ensure connected and return.
         if (sGoogleApiClient != null) {
             if (!sGoogleApiClient.isConnected()) sGoogleApiClient.connect();
             return;
         }
 
         int errorCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity);
-        if (errorCode != ConnectionResult.SUCCESS) {
-            GoogleApiAvailability.getInstance().getErrorDialog(activity, errorCode, GOOGLE_API_REQUEST_CODE).show();
-        } else {
+
+        // If the correct Google Play Services are available, connect and return. 
+        if (errorCode == ConnectionResult.SUCCESS) {
+            sTryCount.set(3);
             GoogleApiCallbacks googleApiCallbacks = new GoogleApiCallbacks();
             sGoogleApiClient = new GoogleApiClient.Builder(activity)
                     .addConnectionCallbacks(googleApiCallbacks)
@@ -56,7 +67,18 @@ public class Location {
                     .addApi(LocationServices.API)
                     .build();
             connectGoogleApi();
+            return;
         }
+
+        // If the correct Google Play Services are not available, redirect to proper solution.
+        if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+            GoogleApiAvailability.getInstance()
+                    .getErrorDialog(activity, errorCode, GOOGLE_API_REQUEST_CODE)
+                    .show();
+            return;
+        }
+
+        Log.e(TAG, "Cannot update Google Play Services: " + errorCode);
     }
 
     public static boolean onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
@@ -144,6 +166,7 @@ public class Location {
                     .resize(cellDims[0], cellDims[1])
                     .centerCrop().transform(mTransform).into(cellHolder.mImageView);
 
+            // TODO: register click listeners with CellFactories?
             cellHolder.mImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
