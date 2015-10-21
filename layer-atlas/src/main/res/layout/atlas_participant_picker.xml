@@ -17,11 +17,11 @@
 
     </com.layer.atlas.layouts.FlowLayout>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/participant_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
 </merge>
