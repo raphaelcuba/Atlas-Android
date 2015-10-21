@@ -56,4 +56,11 @@
     <dimen name="atlas_typing_indicator_dot_size">4dp</dimen>
     <dimen name="atlas_typing_indicator_dot_space">2dp</dimen>
 
+    <!-- Selected participant -->
+    <dimen name="atlas_selected_participant_corner_radius">16dp</dimen>
+    <dimen name="atlas_selected_participant_height">32dp</dimen>
+    <dimen name="atlas_selected_participant_margin">4dp</dimen>
+    <dimen name="atlas_selected_participant_avatar_margin">8dp</dimen>
+
+
 </resources>

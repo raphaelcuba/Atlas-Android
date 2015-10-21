@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.layer.atlas.AtlasAvatar
+        android:id="@+id/participant_avatar"
+        android:layout_width="@dimen/atlas_selected_participant_height"
+        android:layout_height="@dimen/atlas_selected_participant_height"
+        android:layout_marginRight="@dimen/atlas_selected_participant_avatar_margin"/>
+
+    <TextView
+        android:id="@+id/participant_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Chip Baker"
+        android:textColor="@color/atlas_text_gray"
+        android:textSize="13sp"
+        />
+
+    <ImageView
+        android:id="@+id/participant_remove"
+        android:layout_width="@dimen/atlas_selected_participant_height"
+        android:layout_height="@dimen/atlas_selected_participant_height"
+        android:scaleType="center"
+        android:src="@drawable/ic_cancel_white_24dp"
+        android:tint="@color/atlas_icon_gray"
+        />
+
+</merge>
