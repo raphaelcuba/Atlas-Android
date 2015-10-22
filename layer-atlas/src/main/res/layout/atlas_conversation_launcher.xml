@@ -9,7 +9,7 @@
         >
 
         <EditText
-            android:id="@+id/participant_search"
+            android:id="@+id/filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="32dp"

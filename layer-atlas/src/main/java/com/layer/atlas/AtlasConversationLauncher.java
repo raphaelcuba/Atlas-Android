@@ -2,6 +2,8 @@ package com.layer.atlas;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -28,38 +30,41 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AtlasParticipantPicker extends LinearLayout {
+public class AtlasConversationLauncher extends LinearLayout {
     private LayerClient mLayerClient;
     private ParticipantProvider mParticipantProvider;
     private Picasso mPicasso;
 
+    private OnConversationClickListener mOnConversationClickListener;
+
     private FlowLayout mSelectedParticipantLayout;
-    private EditText mSearchText;
+    private EditText mFilter;
     private RecyclerView mParticipantList;
     private AvailableConversationAdapter mAvailableConversationAdapter;
-    private final Set<String> mSelectedParticipantIds = new HashSet<String>();
+    private final Set<String> mSelectedParticipantIds = new LinkedHashSet<String>();
 
-    public AtlasParticipantPicker(Context context, AttributeSet attrs) {
+    public AtlasConversationLauncher(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AtlasParticipantPicker(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AtlasConversationLauncher(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        inflater.inflate(R.layout.atlas_participant_picker, this, true);
+        inflater.inflate(R.layout.atlas_conversation_launcher, this, true);
         mSelectedParticipantLayout = (FlowLayout) findViewById(R.id.selected_participant_group);
-        mSearchText = (EditText) findViewById(R.id.participant_search);
-        mSelectedParticipantLayout.setStretchChild(mSearchText);
+        mFilter = (EditText) findViewById(R.id.filter);
+        mSelectedParticipantLayout.setStretchChild(mFilter);
         mParticipantList = (RecyclerView) findViewById(R.id.participant_list);
         setOrientation(VERTICAL);
     }
 
-    public AtlasParticipantPicker init(LayerClient layerClient, ParticipantProvider participantProvider, Picasso picasso) {
+    public AtlasConversationLauncher init(LayerClient layerClient, ParticipantProvider participantProvider, Picasso picasso) {
         mLayerClient = layerClient;
         mParticipantProvider = participantProvider;
         mPicasso = picasso;
@@ -69,7 +74,7 @@ public class AtlasParticipantPicker extends LinearLayout {
         mAvailableConversationAdapter = new AvailableConversationAdapter(getContext(), mLayerClient, mParticipantProvider, mPicasso);
         mParticipantList.setAdapter(mAvailableConversationAdapter);
 
-        mSearchText.addTextChangedListener(new TextWatcher() {
+        mFilter.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -82,15 +87,24 @@ public class AtlasParticipantPicker extends LinearLayout {
 
             @Override
             public void afterTextChanged(Editable e) {
-                if (e == null || e.toString().trim().isEmpty()) {
-                    mAvailableConversationAdapter.refresh(null, mSelectedParticipantIds);
-                    return;
-                }
-                mAvailableConversationAdapter.refresh(e.toString(), mSelectedParticipantIds);
+                refresh();
             }
         });
+        return this;
+    }
 
-        mAvailableConversationAdapter.refresh(null, mSelectedParticipantIds);
+    public AtlasConversationLauncher setOnConversationClickListener(OnConversationClickListener onConversationClickListener) {
+        mOnConversationClickListener = onConversationClickListener;
+        return this;
+    }
+
+    public List<String> getSelectedParticipanIds() {
+        return new ArrayList<String>(mSelectedParticipantIds);
+    }
+
+    public AtlasConversationLauncher refresh() {
+        if (mAvailableConversationAdapter == null) return this;
+        mAvailableConversationAdapter.refresh(getSearchFilter(), mSelectedParticipantIds);
         return this;
     }
 
@@ -99,31 +113,89 @@ public class AtlasParticipantPicker extends LinearLayout {
         mSelectedParticipantIds.add(participantId);
         ParticipantChip chip = new ParticipantChip(getContext(), mParticipantProvider, participantId, mPicasso);
         mSelectedParticipantLayout.addView(chip, mSelectedParticipantLayout.getChildCount() - 1);
-        mSearchText.setText(null);
-        mAvailableConversationAdapter.refresh(null, mSelectedParticipantIds);
-    }
-
-    private void unselectParticipant(String participantId) {
-        if (!mSelectedParticipantIds.contains(participantId)) return;
-        mSelectedParticipantIds.remove(participantId);
-        for (int i = 0; i < mSelectedParticipantLayout.getChildCount(); i++) {
-            View v = mSelectedParticipantLayout.getChildAt(i);
-            if (!(v instanceof ParticipantChip)) continue;
-            ParticipantChip chip = (ParticipantChip) v;
-            if (!chip.mParticipantId.equals(participantId)) continue;
-            mSelectedParticipantLayout.removeView(chip);
-        }
-        mAvailableConversationAdapter.refresh(null, mSelectedParticipantIds);
+        mFilter.setText(null);
+        refresh();
     }
 
     private void unselectParticipant(ParticipantChip chip) {
         if (!mSelectedParticipantIds.contains(chip.mParticipantId)) return;
         mSelectedParticipantIds.remove(chip.mParticipantId);
         mSelectedParticipantLayout.removeView(chip);
-        mAvailableConversationAdapter.refresh(null, mSelectedParticipantIds);
+        refresh();
     }
 
-    class ParticipantChip extends LinearLayout {
+    private String getSearchFilter() {
+        String s = mFilter.getText().toString();
+        return s.trim().isEmpty() ? null : s;
+    }
+
+    /**
+     * Automatically refresh on resume
+     */
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility != View.VISIBLE) return;
+        refresh();
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        if (mSelectedParticipantIds.isEmpty()) return superState;
+        SavedState savedState = new SavedState(superState);
+        savedState.mSelectedParticipantIds = new ArrayList<String>(mSelectedParticipantIds);
+        return savedState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+
+        if (savedState.mSelectedParticipantIds != null) {
+            mSelectedParticipantIds.clear();
+            for (String participantId : savedState.mSelectedParticipantIds) {
+                selectParticipant(participantId);
+            }
+        }
+    }
+
+    private static class SavedState extends BaseSavedState {
+        List<String> mSelectedParticipantIds;
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeStringList(mSelectedParticipantIds);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+
+        private SavedState(Parcel in) {
+            super(in);
+            mSelectedParticipantIds = in.createStringArrayList();
+        }
+    }
+
+    private class ParticipantChip extends LinearLayout {
         private String mParticipantId;
 
         private AtlasAvatar mAvatar;
@@ -137,10 +209,10 @@ public class AtlasParticipantPicker extends LinearLayout {
             mParticipantId = participantId;
 
             // Inflate and cache views
-            inflater.inflate(R.layout.atlas_selected_participant_item, this, true);
-            mAvatar = (AtlasAvatar) findViewById(R.id.participant_avatar);
-            mName = (TextView) findViewById(R.id.participant_name);
-            mRemove = (ImageView) findViewById(R.id.participant_remove);
+            inflater.inflate(R.layout.atlas_participant_chip, this, true);
+            mAvatar = (AtlasAvatar) findViewById(R.id.avatar);
+            mName = (TextView) findViewById(R.id.name);
+            mRemove = (ImageView) findViewById(R.id.remove);
 
             // Set layout
             int height = r.getDimensionPixelSize(R.dimen.atlas_selected_participant_height);
@@ -170,6 +242,11 @@ public class AtlasParticipantPicker extends LinearLayout {
         CONVERSATION
     }
 
+    /**
+     * AvailableConversationAdapter provides items for individual Participants and existing
+     * Conversations.  Items are filtered by a participant filter string and by a set of selected
+     * Participants.
+     */
     private class AvailableConversationAdapter extends RecyclerView.Adapter<AvailableConversationAdapter.ViewHolder> implements RecyclerViewController.Callback {
         protected final LayerClient mLayerClient;
         protected final ParticipantProvider mParticipantProvider;
@@ -185,10 +262,7 @@ public class AtlasParticipantPicker extends LinearLayout {
         }
 
         public AvailableConversationAdapter(Context context, LayerClient client, ParticipantProvider participantProvider, Picasso picasso, Collection<String> updateAttributes) {
-            Query<Conversation> query = Query.builder(Conversation.class)
-                    .sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_SENT_AT, SortDescriptor.Order.DESCENDING))
-                    .build();
-            mQueryController = client.newRecyclerViewController(query, updateAttributes, this);
+            mQueryController = client.newRecyclerViewController(null, updateAttributes, this);
             mLayerClient = client;
             mParticipantProvider = participantProvider;
             mPicasso = picasso;
@@ -197,7 +271,8 @@ public class AtlasParticipantPicker extends LinearLayout {
         }
 
         /**
-         * Refreshes this adapter by re-running the underlying Query.
+         * Refreshes this adapter by re-querying the ParticipantProvider and filtering Conversations
+         * to return only those Conversations with the given set of selected Participants.
          */
         public void refresh(String filter, Set<String> selectedParticipantIds) {
             // Apply text search filter to available participants
@@ -232,6 +307,7 @@ public class AtlasParticipantPicker extends LinearLayout {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             ViewHolder viewHolder = new ViewHolder(parent);
+            viewHolder.mAvatar.init(mParticipantProvider, mPicasso);
             return viewHolder;
         }
 
@@ -250,18 +326,22 @@ public class AtlasParticipantPicker extends LinearLayout {
                             selectParticipant((String) v.getTag());
                         }
                     });
+                    viewHolder.mAvatar.setParticipants(participantId);
                     break;
 
                 case CONVERSATION:
                     position = adapterPositionToConversationPosition(position);
                     Conversation conversation = mQueryController.getItem(position);
                     viewHolder.mTitle.setText("Conversation: " + conversation.getId().toString());
+                    viewHolder.itemView.setTag(conversation);
                     viewHolder.itemView.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
+                            if (mOnConversationClickListener == null) return;
+                            mOnConversationClickListener.onConversationClick(AtlasConversationLauncher.this, (Conversation) v.getTag());
                         }
                     });
+                    viewHolder.mAvatar.setParticipants(new HashSet<String>(conversation.getParticipants()));
                     break;
             }
         }
@@ -338,15 +418,19 @@ public class AtlasParticipantPicker extends LinearLayout {
         // Inner classes
         //==============================================================================================
 
-        class ViewHolder extends RecyclerView.ViewHolder {
+        protected class ViewHolder extends RecyclerView.ViewHolder {
+            private AtlasAvatar mAvatar;
             private TextView mTitle;
 
             public ViewHolder(ViewGroup parent) {
-                super(LayoutInflater.from(parent.getContext()).inflate(R.layout.atlas_conversation_item, parent, false));
-                mTitle = (TextView) itemView.findViewById(R.id.atlas_conversation_view_convert_participant);
+                super(LayoutInflater.from(parent.getContext()).inflate(R.layout.atlas_conversation_launcher_item, parent, false));
+                mAvatar = (AtlasAvatar) itemView.findViewById(R.id.avatar);
+                mTitle = (TextView) itemView.findViewById(R.id.title);
             }
-
         }
     }
 
+    public interface OnConversationClickListener {
+        void onConversationClick(AtlasConversationLauncher conversationLauncher, Conversation conversation);
+    }
 }

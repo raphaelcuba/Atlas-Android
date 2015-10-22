@@ -403,21 +403,21 @@ public class AtlasParticipantPicker extends FrameLayout {
     }
 
     private void parseStyle(Context context, AttributeSet attrs, int defStyle) {
-        TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AtlasParticipantPicker, R.attr.AtlasParticipantPicker, defStyle);
-        this.inputTextColor = ta.getColor(R.styleable.AtlasParticipantPicker_inputTextColor, context.getResources().getColor(R.color.atlas_text_black));
-        this.inputTextStyle = ta.getInt(R.styleable.AtlasParticipantPicker_inputTextStyle, Typeface.NORMAL);
-        String inputTextTypefaceName = ta.getString(R.styleable.AtlasParticipantPicker_inputTextTypeface);
+        TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AtlasConversationLauncher, R.attr.AtlasParticipantPicker, defStyle);
+        this.inputTextColor = ta.getColor(R.styleable.AtlasConversationLauncher_inputTextColor, context.getResources().getColor(R.color.atlas_text_black));
+        this.inputTextStyle = ta.getInt(R.styleable.AtlasConversationLauncher_inputTextStyle, Typeface.NORMAL);
+        String inputTextTypefaceName = ta.getString(R.styleable.AtlasConversationLauncher_inputTextTypeface);
         this.inputTextTypeface = inputTextTypefaceName != null ? Typeface.create(inputTextTypefaceName, inputTextStyle) : null;
 
-        this.listTextColor = ta.getColor(R.styleable.AtlasParticipantPicker_listTextColor, context.getResources().getColor(R.color.atlas_text_black));
-        this.listTextStyle = ta.getInt(R.styleable.AtlasParticipantPicker_listTextStyle, Typeface.NORMAL);
-        String listTextTypefaceName = ta.getString(R.styleable.AtlasParticipantPicker_listTextTypeface);
+        this.listTextColor = ta.getColor(R.styleable.AtlasConversationLauncher_listTextColor, context.getResources().getColor(R.color.atlas_text_black));
+        this.listTextStyle = ta.getInt(R.styleable.AtlasConversationLauncher_listTextStyle, Typeface.NORMAL);
+        String listTextTypefaceName = ta.getString(R.styleable.AtlasConversationLauncher_listTextTypeface);
         this.listTextTypeface = listTextTypefaceName != null ? Typeface.create(listTextTypefaceName, inputTextStyle) : null;
 
-        this.chipBackgroundColor = ta.getColor(R.styleable.AtlasParticipantPicker_chipBackgroundColor, context.getResources().getColor(R.color.atlas_background_gray));
-        this.chipTextColor = ta.getColor(R.styleable.AtlasParticipantPicker_chipTextColor, context.getResources().getColor(R.color.atlas_text_black));
-        this.chipTextStyle = ta.getInt(R.styleable.AtlasParticipantPicker_chipTextStyle, Typeface.NORMAL);
-        String chipTextTypefaceName = ta.getString(R.styleable.AtlasParticipantPicker_chipTextTypeface);
+        this.chipBackgroundColor = ta.getColor(R.styleable.AtlasConversationLauncher_chipBackgroundColor, context.getResources().getColor(R.color.atlas_background_gray));
+        this.chipTextColor = ta.getColor(R.styleable.AtlasConversationLauncher_chipTextColor, context.getResources().getColor(R.color.atlas_text_black));
+        this.chipTextStyle = ta.getInt(R.styleable.AtlasConversationLauncher_chipTextStyle, Typeface.NORMAL);
+        String chipTextTypefaceName = ta.getString(R.styleable.AtlasConversationLauncher_chipTextTypeface);
         this.chipTextTypeface = chipTextTypefaceName != null ? Typeface.create(chipTextTypefaceName, inputTextStyle) : null;
         ta.recycle();
     }

@@ -63,7 +63,7 @@
     </declare-styleable>
 
     <!-- TODO: use "android:" when possible  -->
-    <declare-styleable name="AtlasParticipantPicker">
+    <declare-styleable name="AtlasConversationLauncher">
         <attr name="inputTextColor"/>
         <attr name="inputTextTypeface"/>
         <attr name="inputTextStyle"/>

@@ -2,13 +2,13 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.layer.atlas.AtlasAvatar
-        android:id="@+id/participant_avatar"
+        android:id="@+id/avatar"
         android:layout_width="@dimen/atlas_selected_participant_height"
         android:layout_height="@dimen/atlas_selected_participant_height"
         android:layout_marginRight="@dimen/atlas_selected_participant_avatar_margin"/>
 
     <TextView
-        android:id="@+id/participant_name"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -19,7 +19,7 @@
         />
 
     <ImageView
-        android:id="@+id/participant_remove"
+        android:id="@+id/remove"
         android:layout_width="@dimen/atlas_selected_participant_height"
         android:layout_height="@dimen/atlas_selected_participant_height"
         android:scaleType="center"
