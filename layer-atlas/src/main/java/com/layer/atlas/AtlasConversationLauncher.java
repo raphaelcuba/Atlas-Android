@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +76,19 @@ public class AtlasConversationLauncher extends LinearLayout {
         mAvailableConversationAdapter = new AvailableConversationAdapter(getContext(), mLayerClient, mParticipantProvider, mPicasso);
         mParticipantList.setAdapter(mAvailableConversationAdapter);
 
+        // Hitting backspace with an empty search string deletes the last selected participant
+        mFilter.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_UP && (getSearchFilter() == null)) {
+                    removeLastSelectedParticipant();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // Refresh available participants and conversations with every search string change
         mFilter.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -130,6 +144,17 @@ public class AtlasConversationLauncher extends LinearLayout {
         return s.trim().isEmpty() ? null : s;
     }
 
+    private String removeLastSelectedParticipant() {
+        ParticipantChip lastChip = null;
+        for (int i = 0; i < mSelectedParticipantLayout.getChildCount(); i++) {
+            View v = mSelectedParticipantLayout.getChildAt(i);
+            if (v instanceof ParticipantChip) lastChip = (ParticipantChip) v;
+        }
+        if (lastChip == null) return null;
+        unselectParticipant(lastChip);
+        return lastChip.mParticipantId;
+    }
+
     /**
      * Automatically refresh on resume
      */
@@ -140,6 +165,9 @@ public class AtlasConversationLauncher extends LinearLayout {
         refresh();
     }
 
+    /**
+     * Save selected participants
+     */
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -149,6 +177,9 @@ public class AtlasConversationLauncher extends LinearLayout {
         return savedState;
     }
 
+    /**
+     * Restore selected participants
+     */
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         if (!(state instanceof SavedState)) {
@@ -196,6 +227,9 @@ public class AtlasConversationLauncher extends LinearLayout {
         }
     }
 
+    /**
+     * ParticipantChip implements the View used to populate the selected participant FlowLayout.
+     */
     private class ParticipantChip extends LinearLayout {
         private String mParticipantId;
 

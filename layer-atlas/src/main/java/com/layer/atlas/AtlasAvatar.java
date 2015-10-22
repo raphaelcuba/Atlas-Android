@@ -80,8 +80,7 @@ public class AtlasAvatar extends View {
     private float mTextSize;
 
     private Rect mRect = new Rect();
-    private RectF mInnerRect = new RectF();
-
+    private RectF mContentRect = new RectF();
 
     public AtlasAvatar(Context context) {
         super(context);
@@ -214,14 +213,16 @@ public class AtlasAvatar extends View {
             int avatarCount = mInitials.size();
             canvas.drawRect(0f, 0f, canvas.getWidth(), canvas.getHeight(), PAINT_TRANSPARENT);
             if (avatarCount == 0) return;
+            boolean isBorder = (avatarCount != 1);
+            float contentRadius = isBorder ? mInnerRadius : mOuterRadius;
 
             // Draw avatar cluster
             float cx = mCenterX;
             float cy = mCenterY;
-            mInnerRect.set(cx - mInnerRadius, cy - mInnerRadius, cx + mInnerRadius, cy + mInnerRadius);
+            mContentRect.set(cx - contentRadius, cy - contentRadius, cx + contentRadius, cy + contentRadius);
             for (Map.Entry<String, String> entry : mInitials.entrySet()) {
-                // Border and background
-                canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
+                // Border / background
+                if (isBorder) canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
 
                 // Initials or bitmap
                 ImageTarget imageTarget = mImageTargets.get(entry.getKey());
@@ -230,16 +231,16 @@ public class AtlasAvatar extends View {
                     String initials = entry.getValue();
                     mPaintInitials.setTextSize(mTextSize);
                     mPaintInitials.getTextBounds(initials, 0, initials.length(), mRect);
-                    canvas.drawCircle(cx, cy, mInnerRadius, mPaintBackground);
+                    canvas.drawCircle(cx, cy, contentRadius, mPaintBackground);
                     canvas.drawText(initials, cx - mRect.centerX(), cy - mRect.centerY() - 1f, mPaintInitials);
                 } else {
-                    canvas.drawBitmap(bitmap, mInnerRect.left, mInnerRect.top, PAINT_BITMAP);
+                    canvas.drawBitmap(bitmap, mContentRect.left, mContentRect.top, PAINT_BITMAP);
                 }
 
                 // Translate for next avatar
                 cx += mDeltaX;
                 cy += mDeltaY;
-                mInnerRect.offset(mDeltaX, mDeltaY);
+                mContentRect.offset(mDeltaX, mDeltaY);
             }
         }
     }
