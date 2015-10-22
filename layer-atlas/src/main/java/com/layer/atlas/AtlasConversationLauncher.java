@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.layer.atlas.layouts.FlowLayout;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
+import com.layer.sdk.query.CompoundPredicate;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.RecyclerViewController;
@@ -28,7 +30,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -290,11 +291,15 @@ public class AtlasConversationLauncher extends LinearLayout {
             mParticipantIds.addAll(newParticipantIds);
             notifyDataSetChanged();
 
-            // Filter down to only those conversations including the selected participants
+            // Filter down to only those conversations including the selected participants, hiding one-on-one conversations
             Query.Builder<Conversation> builder = Query.builder(Conversation.class)
                     .sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_SENT_AT, SortDescriptor.Order.DESCENDING));
-            if (!selectedParticipantIds.isEmpty()) {
-                builder.predicate(new Predicate(Conversation.Property.PARTICIPANTS, Predicate.Operator.IN, selectedParticipantIds));
+            if (selectedParticipantIds.isEmpty()) {
+                builder.predicate(new Predicate(Conversation.Property.PARTICIPANT_COUNT, Predicate.Operator.GREATER_THAN, 2));
+            } else {
+                builder.predicate(new CompoundPredicate(CompoundPredicate.Type.AND,
+                        new Predicate(Conversation.Property.PARTICIPANT_COUNT, Predicate.Operator.GREATER_THAN, 2),
+                        new Predicate(Conversation.Property.PARTICIPANTS, Predicate.Operator.IN, selectedParticipantIds)));
             }
             mQueryController.setQuery(builder.build()).execute();
         }
@@ -314,11 +319,11 @@ public class AtlasConversationLauncher extends LinearLayout {
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
             switch (getType(position)) {
-                case PARTICIPANT:
+                case PARTICIPANT: {
                     position = adapterPositionToparticipantPosition(position);
                     String participantId = mParticipantIds.get(position);
                     Participant participant = mParticipants.get(participantId);
-                    viewHolder.mTitle.setText("Participant: " + participant.getName());
+                    viewHolder.mTitle.setText(participant.getName());
                     viewHolder.itemView.setTag(participantId);
                     viewHolder.itemView.setOnClickListener(new OnClickListener() {
                         @Override
@@ -327,12 +332,23 @@ public class AtlasConversationLauncher extends LinearLayout {
                         }
                     });
                     viewHolder.mAvatar.setParticipants(participantId);
-                    break;
+                }
+                break;
 
-                case CONVERSATION:
+                case CONVERSATION: {
                     position = adapterPositionToConversationPosition(position);
                     Conversation conversation = mQueryController.getItem(position);
-                    viewHolder.mTitle.setText("Conversation: " + conversation.getId().toString());
+                    String userId = mLayerClient.getAuthenticatedUserId();
+                    List<String> names = new ArrayList<String>();
+                    Set<String> ids = new LinkedHashSet<String>();
+                    for (String participantId : conversation.getParticipants()) {
+                        if (participantId.equals(userId)) continue;
+                        ids.add(participantId);
+                        Participant p = mParticipantProvider.getParticipant(participantId);
+                        if (p == null) continue;
+                        names.add(p.getName());
+                    }
+                    viewHolder.mTitle.setText(TextUtils.join(", ", names));
                     viewHolder.itemView.setTag(conversation);
                     viewHolder.itemView.setOnClickListener(new OnClickListener() {
                         @Override
@@ -341,8 +357,9 @@ public class AtlasConversationLauncher extends LinearLayout {
                             mOnConversationClickListener.onConversationClick(AtlasConversationLauncher.this, (Conversation) v.getTag());
                         }
                     });
-                    viewHolder.mAvatar.setParticipants(new HashSet<String>(conversation.getParticipants()));
-                    break;
+                    viewHolder.mAvatar.setParticipants(ids);
+                }
+                break;
             }
         }
 
