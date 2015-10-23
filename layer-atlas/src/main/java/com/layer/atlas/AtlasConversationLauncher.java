@@ -10,16 +10,16 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.layer.atlas.layouts.FlowLayout;
+import com.layer.atlas.utilviews.EmptyDelEditText;
+import com.layer.atlas.utilviews.FlowLayout;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.CompoundPredicate;
@@ -46,7 +46,7 @@ public class AtlasConversationLauncher extends LinearLayout {
     private OnParticipantSelectionChangeListener mOnParticipantSelectionChangeListener;
 
     private FlowLayout mSelectedParticipantLayout;
-    private EditText mFilter;
+    private EmptyDelEditText mFilter;
     private RecyclerView mParticipantList;
     private AvailableConversationAdapter mAvailableConversationAdapter;
     private final Set<String> mSelectedParticipantIds = new LinkedHashSet<String>();
@@ -61,7 +61,7 @@ public class AtlasConversationLauncher extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.atlas_conversation_launcher, this, true);
         mSelectedParticipantLayout = (FlowLayout) findViewById(R.id.selected_participant_group);
-        mFilter = (EditText) findViewById(R.id.filter);
+        mFilter = (EmptyDelEditText) findViewById(R.id.filter);
         mSelectedParticipantLayout.setStretchChild(mFilter);
         mParticipantList = (RecyclerView) findViewById(R.id.participant_list);
         setOrientation(VERTICAL);
@@ -78,14 +78,11 @@ public class AtlasConversationLauncher extends LinearLayout {
         mParticipantList.setAdapter(mAvailableConversationAdapter);
 
         // Hitting backspace with an empty search string deletes the last selected participant
-        mFilter.setOnKeyListener(new OnKeyListener() {
+        mFilter.setOnEmptyDelListener(new EmptyDelEditText.OnEmptyDelListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_UP && (getSearchFilter() == null)) {
-                    removeLastSelectedParticipant();
-                    return true;
-                }
-                return false;
+            public boolean onEmptyDel(EmptyDelEditText editText) {
+                removeLastSelectedParticipant();
+                return true;
             }
         });
 
@@ -492,6 +489,7 @@ public class AtlasConversationLauncher extends LinearLayout {
             }
         }
     }
+
 
     public interface OnConversationClickListener {
         void onConversationClick(AtlasConversationLauncher conversationLauncher, Conversation conversation);

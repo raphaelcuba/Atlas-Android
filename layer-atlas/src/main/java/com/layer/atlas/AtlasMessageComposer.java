@@ -199,6 +199,11 @@ public class AtlasMessageComposer extends FrameLayout {
         return this;
     }
 
+    public AtlasMessageComposer setOnMessageTextFocusChangeListener(OnFocusChangeListener listener) {
+        mMessageText.setOnFocusChangeListener(listener);
+        return this;
+    }
+
     private void applyStyle() {
         //mMessageText.setTextSize(mTextSize);
         mMessageText.setTypeface(mTypeface, mTextStyle);
@@ -269,4 +274,9 @@ public class AtlasMessageComposer extends FrameLayout {
         }
         return this;
     }
+
+    public interface OnMessageTextFocusChangeListener {
+
+    }
+
 }

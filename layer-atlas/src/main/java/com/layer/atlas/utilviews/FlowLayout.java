@@ -16,7 +16,7 @@
  limitations under the License.
  **/
 
-package com.layer.atlas.layouts;
+package com.layer.atlas.utilviews;
 
 import android.content.Context;
 import android.util.AttributeSet;
