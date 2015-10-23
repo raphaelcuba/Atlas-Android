@@ -43,6 +43,7 @@ public class AtlasConversationLauncher extends LinearLayout {
     private Picasso mPicasso;
 
     private OnConversationClickListener mOnConversationClickListener;
+    private OnParticipantSelectionChangeListener mOnParticipantSelectionChangeListener;
 
     private FlowLayout mSelectedParticipantLayout;
     private EditText mFilter;
@@ -113,6 +114,11 @@ public class AtlasConversationLauncher extends LinearLayout {
         return this;
     }
 
+    public AtlasConversationLauncher setOnParticipantSelectionChangeListener(OnParticipantSelectionChangeListener onParticipantSelectionChangeListener) {
+        mOnParticipantSelectionChangeListener = onParticipantSelectionChangeListener;
+        return this;
+    }
+
     public List<String> getSelectedParticipanIds() {
         return new ArrayList<String>(mSelectedParticipantIds);
     }
@@ -130,6 +136,9 @@ public class AtlasConversationLauncher extends LinearLayout {
         mSelectedParticipantLayout.addView(chip, mSelectedParticipantLayout.getChildCount() - 1);
         mFilter.setText(null);
         refresh();
+        if (mOnParticipantSelectionChangeListener != null) {
+            mOnParticipantSelectionChangeListener.onParticipantSelectionChanged(this, new ArrayList<String>(mSelectedParticipantIds));
+        }
     }
 
     private void unselectParticipant(ParticipantChip chip) {
@@ -137,6 +146,9 @@ public class AtlasConversationLauncher extends LinearLayout {
         mSelectedParticipantIds.remove(chip.mParticipantId);
         mSelectedParticipantLayout.removeView(chip);
         refresh();
+        if (mOnParticipantSelectionChangeListener != null) {
+            mOnParticipantSelectionChangeListener.onParticipantSelectionChanged(this, new ArrayList<String>(mSelectedParticipantIds));
+        }
     }
 
     private String getSearchFilter() {
@@ -483,5 +495,9 @@ public class AtlasConversationLauncher extends LinearLayout {
 
     public interface OnConversationClickListener {
         void onConversationClick(AtlasConversationLauncher conversationLauncher, Conversation conversation);
+    }
+
+    public interface OnParticipantSelectionChangeListener {
+        void onParticipantSelectionChanged(AtlasConversationLauncher conversationLauncher, List<String> participantIds);
     }
 }
