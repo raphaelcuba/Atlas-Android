@@ -11,8 +11,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.layer.atlas.R;
-import com.layer.atlas.utils.Utils;
-import com.layer.atlas.utils.picasso.transformations.RoundedTransform;
+import com.layer.atlas.utilities.Utils;
+import com.layer.atlas.utilities.picasso.transformations.RoundedTransform;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.squareup.picasso.Callback;

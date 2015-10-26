@@ -1,4 +1,4 @@
-package com.layer.atlas.utils.typingindicators;
+package com.layer.atlas.typingindicators;
 
 import android.content.Context;
 import android.content.res.Resources;

@@ -19,8 +19,8 @@ import android.widget.TextView;
 
 import com.layer.atlas.provider.Participant;
 import com.layer.atlas.provider.ParticipantProvider;
-import com.layer.atlas.utils.views.EmptyDelEditText;
-import com.layer.atlas.utils.views.FlowLayout;
+import com.layer.atlas.utilities.views.EmptyDelEditText;
+import com.layer.atlas.utilities.views.FlowLayout;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.CompoundPredicate;

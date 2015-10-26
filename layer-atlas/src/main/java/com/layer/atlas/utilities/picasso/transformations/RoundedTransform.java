@@ -1,4 +1,4 @@
-package com.layer.atlas.utils.picasso.transformations;
+package com.layer.atlas.utilities.picasso.transformations;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

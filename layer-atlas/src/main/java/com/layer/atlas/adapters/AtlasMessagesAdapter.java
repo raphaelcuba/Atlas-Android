@@ -18,7 +18,7 @@ import com.layer.atlas.R;
 import com.layer.atlas.cellfactories.AtlasCellFactory;
 import com.layer.atlas.provider.Participant;
 import com.layer.atlas.provider.ParticipantProvider;
-import com.layer.atlas.utils.Utils;
+import com.layer.atlas.utilities.Utils;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Actor;
 import com.layer.sdk.messaging.Message;

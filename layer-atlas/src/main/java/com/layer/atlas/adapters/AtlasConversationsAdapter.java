@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.layer.atlas.AtlasAvatar;
 import com.layer.atlas.R;
 import com.layer.atlas.provider.ParticipantProvider;
-import com.layer.atlas.utils.Utils;
+import com.layer.atlas.utilities.Utils;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;

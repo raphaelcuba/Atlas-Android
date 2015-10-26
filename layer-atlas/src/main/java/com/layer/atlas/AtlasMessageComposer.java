@@ -39,8 +39,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.layer.atlas.provider.ParticipantProvider;
-import com.layer.atlas.senders.AttachmentSender;
-import com.layer.atlas.senders.TextSender;
+import com.layer.atlas.messagesenders.AttachmentSender;
+import com.layer.atlas.messagesenders.TextSender;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;

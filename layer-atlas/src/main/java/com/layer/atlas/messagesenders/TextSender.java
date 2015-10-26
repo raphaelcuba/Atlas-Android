@@ -1,4 +1,4 @@
-package com.layer.atlas.senders;
+package com.layer.atlas.messagesenders;
 
 import android.util.Log;
 

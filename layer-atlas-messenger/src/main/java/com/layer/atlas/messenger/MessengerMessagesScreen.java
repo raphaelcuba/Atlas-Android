@@ -46,7 +46,7 @@ import com.layer.atlas.old.Utils;
 import com.layer.atlas.old.Utils.Tools;
 import com.layer.atlas.old.cells.Cell;
 import com.layer.atlas.old.cells.ImageCell;
-import com.layer.atlas.utils.typingindicators.BubbleTypingIndicatorFactory;
+import com.layer.atlas.typingindicators.BubbleTypingIndicatorFactory;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.changes.LayerChangeEvent;
 import com.layer.sdk.listeners.LayerChangeEventListener;

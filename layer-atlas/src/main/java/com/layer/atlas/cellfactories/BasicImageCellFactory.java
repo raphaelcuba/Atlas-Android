@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.layer.atlas.R;
-import com.layer.atlas.utils.picasso.transformations.RoundedTransform;
+import com.layer.atlas.utilities.picasso.transformations.RoundedTransform;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.squareup.picasso.Picasso;

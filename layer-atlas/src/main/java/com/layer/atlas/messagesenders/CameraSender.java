@@ -1,4 +1,4 @@
-package com.layer.atlas.senders;
+package com.layer.atlas.messagesenders;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,7 +8,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.layer.atlas.R;
-import com.layer.atlas.utils.Utils;
+import com.layer.atlas.utilities.Utils;
 import com.layer.sdk.messaging.Message;
 
 import java.io.File;

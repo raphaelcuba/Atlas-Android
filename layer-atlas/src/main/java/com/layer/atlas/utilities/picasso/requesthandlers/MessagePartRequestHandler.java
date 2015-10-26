@@ -1,4 +1,4 @@
-package com.layer.atlas.utils.picasso.requesthandlers;
+package com.layer.atlas.utilities.picasso.requesthandlers;
 
 import android.net.Uri;
 import android.util.Log;
