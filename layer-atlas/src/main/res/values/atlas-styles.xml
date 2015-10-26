@@ -35,7 +35,7 @@
         <item name="cellUnreadBackgroundColor">@android:color/transparent</item>
         <item name="dateTextColor">@color/atlas_text_blue</item>
         <item name="avatarTextColor">@color/atlas_text_black</item>
-        <item name="avatarBackgroundColor">@color/atlas_background_gray</item>
+        <item name="avatarBackgroundColor">@color/atlas_avatar_background</item>
     </style>
 
     <style name="AtlasMessageComposer">
@@ -47,19 +47,19 @@
     </style>
 
     <style name="AtlasMessageList">
-        <item name="myBubbleColor">@color/atlas_bubble_blue</item>
+        <item name="myBubbleColor">@color/atlas_cell_me_background</item>
         <item name="myTextColor">@color/atlas_text_white</item>
         <item name="myTextSize">@dimen/atlas_text_size_general</item>
         <item name="myTextTypeface">normal</item>
         <item name="myTextStyle">normal</item>
-        <item name="theirBubbleColor">@color/atlas_background_gray</item>
+        <item name="theirBubbleColor">@color/atlas_cell_them_background</item>
         <item name="theirTextColor">@color/atlas_text_black</item>
         <item name="theirTextSize">@dimen/atlas_text_size_general</item>
         <item name="theirTextTypeface">normal</item>
         <item name="theirTextStyle">normal</item>
         <item name="dateTextColor">@color/atlas_text_gray</item>
         <item name="avatarTextColor">@color/atlas_text_black</item>
-        <item name="avatarBackgroundColor">@color/atlas_background_gray</item>
+        <item name="avatarBackgroundColor">@color/atlas_avatar_background</item>
     </style>
 
     <style name="AtlasParticipantPicker">
@@ -69,9 +69,9 @@
         <item name="listTextColor">@color/atlas_text_black</item>
         <item name="listTextTypeface">normal</item>
         <item name="listTextStyle">normal</item>
-        <item name="avatarBackgroundColor">@color/atlas_background_gray</item>
+        <item name="avatarBackgroundColor">@color/atlas_avatar_background</item>
         <item name="avatarTextColor">@color/atlas_text_black</item>
-        <item name="chipBackgroundColor">@color/atlas_background_gray</item>
+        <item name="chipBackgroundColor">@color/atlas_chip_background</item>
         <item name="chipTextColor">@color/atlas_text_black</item>
         <item name="chipTextTypeface">normal</item>
         <item name="chipTextStyle">normal</item>
@@ -90,7 +90,7 @@
     <!-- ########## -->
     <style name="AtlasActionBar" parent="@style/Widget.AppCompat.ActionBar">
         <item name="titleTextStyle">@style/AtlasActionBarTitleText</item>
-        <item name="background">@color/atlas_background_blue</item>
+        <item name="background">@color/atlas_action_bar_background</item>
     </style>
 
     <style name="AtlasActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
@@ -102,11 +102,11 @@
     </style>
 
     <style name="AtlasActionBarButton" parent="@style/Widget.AppCompat.ActionButton">
-        <item name="android:tint">@color/atlas_background_white</item>
+        <item name="android:tint">@color/atlas_text_white</item>
     </style>
 
     <style name="AtlasActionBarOverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:tint">@color/atlas_background_white</item>
+        <item name="android:tint">@color/atlas_text_white</item>
     </style>
 
 </resources>

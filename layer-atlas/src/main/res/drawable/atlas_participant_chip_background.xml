@@ -15,11 +15,9 @@
 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
-    <corners android:radius="@dimen/atlas_message_item_cell_radius"/>
-    <padding
-        android:bottom="@dimen/atlas_message_item_cell_padding_bottom"
-        android:left="@dimen/atlas_message_item_cell_padding_far"
-        android:right="@dimen/atlas_message_item_cell_padding_near"
-        android:top="@dimen/atlas_message_item_cell_padding_top"/>
-    <solid android:color="@color/atlas_cell_me_background"/>
+
+    <corners android:radius="@dimen/atlas_selected_participant_corner_radius"/>
+
+    <solid android:color="@color/atlas_chip_background"/>
+
 </shape>

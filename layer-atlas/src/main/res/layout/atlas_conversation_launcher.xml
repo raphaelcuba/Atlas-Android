@@ -2,20 +2,20 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.layer.atlas.utilviews.FlowLayout
+    <com.layer.atlas.utils.views.FlowLayout
         android:id="@+id/selected_participant_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
 
-        <com.layer.atlas.utilviews.EmptyDelEditText
+        <com.layer.atlas.utils.views.EmptyDelEditText
             android:id="@+id/filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="32dp"
             />
 
-    </com.layer.atlas.utilviews.FlowLayout>
+    </com.layer.atlas.utils.views.FlowLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/participant_list"

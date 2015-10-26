@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.layer.atlas.AtlasAvatar;
-import com.layer.atlas.ParticipantProvider;
 import com.layer.atlas.R;
-import com.layer.atlas.old.Utils;
+import com.layer.atlas.provider.ParticipantProvider;
+import com.layer.atlas.utils.Utils;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
@@ -138,23 +138,19 @@ public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConvers
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Conversation conversation = mQueryController.getItem(position);
-
-        String userId = mLayerClient.getAuthenticatedUserId();
-        Message lastMessage = conversation.getLastMessage();
-
         viewHolder.setConversation(conversation);
         HashSet<String> participantIds = new HashSet<String>(conversation.getParticipants());
-        participantIds.remove(userId);
+        participantIds.remove(mLayerClient.getAuthenticatedUserId());
         viewHolder.mAvatarCluster.setParticipants(participantIds);
+        viewHolder.mTitleView.setText(Utils.getConversationTitle(mLayerClient, mParticipantProvider, conversation));
 
-        viewHolder.mTitleView.setText(Utils.getTitle(conversation, mParticipantProvider, userId));
-
+        Message lastMessage = conversation.getLastMessage();
         if (lastMessage == null) {
             viewHolder.mMessageView.setText(null);
             viewHolder.mTimeView.setText(null);
         } else {
-            viewHolder.mMessageView.setText(Utils.Tools.toString(lastMessage));
-            viewHolder.mTitleView.setTypeface(null, (viewHolder.mConversation.getTotalUnreadMessageCount() > 0)? Typeface.BOLD : Typeface.NORMAL);
+            viewHolder.mMessageView.setText(Utils.getLastMessageString(lastMessage));
+            viewHolder.mTitleView.setTypeface(null, (viewHolder.mConversation.getTotalUnreadMessageCount() > 0) ? Typeface.BOLD : Typeface.NORMAL);
             if (lastMessage.getSentAt() == null) {
                 viewHolder.mTimeView.setText(null);
             } else {
@@ -166,14 +162,6 @@ public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConvers
     @Override
     public int getItemCount() {
         return mQueryController.getItemCount();
-    }
-
-    public Integer getPosition(Conversation conversation) {
-        return mQueryController.getPosition(conversation);
-    }
-
-    public Integer getPosition(Conversation conversation, int lastPosition) {
-        return mQueryController.getPosition(conversation, lastPosition);
     }
 
     public Conversation getItem(int position) {

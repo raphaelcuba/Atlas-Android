@@ -19,7 +19,7 @@
     <!-- Atlas Style -->
     <!-- ########### -->
     <style name="Theme.Atlas.Light" parent="Theme.Atlas.Base.Light">
-        <item name="android:statusBarColor">@color/atlas_background_blue_dark</item>
+        <item name="android:statusBarColor">@color/atlas_status_bar_background</item>
     </style>
 
 </resources>

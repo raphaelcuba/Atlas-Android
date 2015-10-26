@@ -11,7 +11,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.layer.atlas.simple.transformations.CircleTransform;
+import com.layer.atlas.provider.Participant;
+import com.layer.atlas.provider.ParticipantProvider;
+import com.layer.atlas.utils.picasso.transformations.CircleTransform;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.layer.atlas.adapters.AtlasConversationsAdapter;
+import com.layer.atlas.provider.ParticipantProvider;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.squareup.picasso.Picasso;
@@ -160,7 +161,7 @@ public class AtlasConversationsList extends RecyclerView {
             mCellUnreadBackgroundColor = ta.getColor(R.styleable.AtlasConversationsList_cellUnreadBackgroundColor, Color.TRANSPARENT);
             mDateTextColor = ta.getColor(R.styleable.AtlasConversationsList_dateTextColor, context.getResources().getColor(R.color.atlas_text_black));
             mAvatarTextColor = ta.getColor(R.styleable.AtlasConversationsList_avatarTextColor, context.getResources().getColor(R.color.atlas_text_black));
-            mAvatarBackgroundColor = ta.getColor(R.styleable.AtlasConversationsList_avatarBackgroundColor, context.getResources().getColor(R.color.atlas_shape_avatar_gray));
+            mAvatarBackgroundColor = ta.getColor(R.styleable.AtlasConversationsList_avatarBackgroundColor, context.getResources().getColor(R.color.atlas_avatar_background));
 
             ta.recycle();
         }

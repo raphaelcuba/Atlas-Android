@@ -14,11 +14,11 @@ import android.widget.Space;
 import android.widget.TextView;
 
 import com.layer.atlas.AtlasAvatar;
-import com.layer.atlas.AtlasCellFactory;
-import com.layer.atlas.Participant;
-import com.layer.atlas.ParticipantProvider;
 import com.layer.atlas.R;
-import com.layer.atlas.old.Utils;
+import com.layer.atlas.cellfactories.AtlasCellFactory;
+import com.layer.atlas.provider.Participant;
+import com.layer.atlas.provider.ParticipantProvider;
+import com.layer.atlas.utils.Utils;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Actor;
 import com.layer.sdk.messaging.Message;

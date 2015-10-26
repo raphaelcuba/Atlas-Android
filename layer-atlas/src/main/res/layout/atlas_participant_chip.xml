@@ -23,7 +23,7 @@
         android:layout_height="@dimen/atlas_selected_participant_height"
         android:scaleType="center"
         android:src="@drawable/ic_cancel_white_24dp"
-        android:tint="@color/atlas_icon_gray"
+        android:tint="@color/atlas_icon_enabled"
         />
 
 </merge>

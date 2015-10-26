@@ -38,8 +38,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.layer.atlas.messages.AttachmentSender;
-import com.layer.atlas.messages.TextSender;
+import com.layer.atlas.provider.ParticipantProvider;
+import com.layer.atlas.senders.AttachmentSender;
+import com.layer.atlas.senders.TextSender;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
@@ -137,7 +138,7 @@ public class AtlasMessageComposer extends FrameLayout {
             iconView.setImageResource(sender.getIcon());
             iconView.setVisibility(VISIBLE);
             Drawable d = DrawableCompat.wrap(iconView.getDrawable());
-            DrawableCompat.setTint(d, getResources().getColor(R.color.atlas_icon_gray));
+            DrawableCompat.setTint(d, getResources().getColor(R.color.atlas_icon_enabled));
         }
         menuLayout.addView(menuItem);
     }

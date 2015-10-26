@@ -14,37 +14,35 @@
      limitations under the License.    
 -->
 <resources>
-    <color name="atlas_delimeter_gray">#18000000</color>
-    <color name="atlas_shape_avatar_gray">#14000000</color>
 
-    <color name="atlas_bubble_blue">#FF21AAE1</color>
+    <!-- Action bar and notification bar -->
+    <color name="atlas_status_bar_background">#FF198BB8</color>
+    <color name="atlas_action_bar_background">#FF21AAE1</color>
+    <color name="atlas_window_background">#FFFFFFFF</color>
 
-    <color name="atlas_icon_gray">#89000000</color>
+    <color name="atlas_floating_button">#FF21AAE1</color>
 
-    <color name="atlas_text_blue">#FF21AAE1</color>
-    <color name="atlas_text_blue_bright">#FF2196F3</color>
-    <color name="atlas_text_gray">#86000000</color>
     <color name="atlas_text_black">#FF000000</color>
-    <color name="atlas_text_black87">#DD000000</color>
+    <color name="atlas_text_gray">#FF757575</color>
     <color name="atlas_text_white">#FFFFFFFF</color>
+    <color name="atlas_text_blue">#FF21AAE1</color>
 
-    <color name="atlas_background_white">#FFFFFFFF</color>
-    <color name="atlas_background_black">#FF000000</color>
-    <color name="atlas_background_blue">#FF21AAE1</color>
-    <color name="atlas_background_blue_bright">#FF2196F3</color>
-    <color name="atlas_background_blue_dark">#FF198BB8</color>
-    <color name="atlas_background_gray">#FFEBEBEB</color>
-    <color name="atlas_background_transparent">#00FFFFFF</color>
+    <color name="atlas_button_text_enabled">#FF000000</color>
+    <color name="atlas_button_text_disabled">#42000000</color>
+    <color name="atlas_button_text_pressed">#FF21AAE1</color>
 
-    <color name="atlas_qr_mask">#80000000</color>
-    <color name="atlas_qr_laser">#FF2196F3</color>
-    <color name="atlas_qr_result">#FFFFFFFF</color>
+    <color name="atlas_item_background">#00000000</color>
+    <color name="atlas_item_selected">#FFD8D8D8</color>
+    <color name="atlas_item_divider">#FFE0E0E0</color>
 
-    <!-- proper way to declare colors  -->
-    <color name="atlas_view_participant_picker_text_background">@color/atlas_background_white</color>
-    <color name="atlas_view_participant_picker_list_background">@color/atlas_background_white</color>
+    <color name="atlas_view_divider">#FFE0E0E0</color>
 
-    <!-- menu item background -->
-    <color name="atlas_menu_item_background_gray">#FFEDEDED</color>
+    <color name="atlas_avatar_background">#FFEBEBEB</color>
+    <color name="atlas_chip_background">#FFEBEBEB</color>
 
+    <color name="atlas_cell_them_background">#FFEBEBEB</color>
+    <color name="atlas_cell_me_background">#FF21AAE1</color>
+
+    <color name="atlas_icon_enabled">#8A000000</color>
+    <color name="atlas_icon_disabled">#3D000000</color>
 </resources>

@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="bottom"
-            android:background="@color/atlas_delimeter_gray"
+            android:background="@color/atlas_item_divider"
             />
 
         <LinearLayout

@@ -10,11 +10,11 @@
         <item name="AtlasParticipantPicker">@style/AtlasParticipantPicker</item>
         <item name="AtlasTypingIndicator">@style/AtlasTypingIndicator</item>
 
-        <item name="colorPrimary">@color/atlas_background_blue</item>
-        <item name="colorPrimaryDark">@color/atlas_background_blue_dark</item>
+        <item name="colorPrimary">@color/atlas_action_bar_background</item>
+        <item name="colorPrimaryDark">@color/atlas_status_bar_background</item>
 
         <!-- floating action button; EditText cursor -->
-        <item name="colorAccent">@color/atlas_background_blue</item>
+        <item name="colorAccent">@color/atlas_floating_button</item>
 
         <item name="actionBarStyle">@style/AtlasActionBar</item>
         <item name="actionBarTabTextStyle">@style/AtlasActionBarTabText</item>
@@ -22,7 +22,7 @@
         <item name="actionButtonStyle">@style/AtlasActionBarButton</item>
         <item name="actionOverflowButtonStyle">@style/AtlasActionBarOverflowButton</item>
 
-        <item name="android:windowBackground">@color/atlas_background_white</item>
+        <item name="android:windowBackground">@color/atlas_window_background</item>
         <item name="android:popupBackground">@drawable/atlas_popup_background</item>
     </style>
 

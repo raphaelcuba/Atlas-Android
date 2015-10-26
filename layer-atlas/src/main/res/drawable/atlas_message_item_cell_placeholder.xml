@@ -18,5 +18,5 @@
     <corners android:radius="@dimen/atlas_message_item_cell_radius"/>
     <stroke
         android:width="2dp"
-        android:color="@color/atlas_background_gray"/>
+        android:color="@color/atlas_cell_them_background"/>
 </shape>
