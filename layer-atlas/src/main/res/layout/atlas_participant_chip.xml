@@ -4,19 +4,18 @@
     <com.layer.atlas.AtlasAvatar
         android:id="@+id/avatar"
         android:layout_width="@dimen/atlas_selected_participant_height"
-        android:layout_height="@dimen/atlas_selected_participant_height"
-        android:layout_marginRight="@dimen/atlas_selected_participant_avatar_margin"/>
+        android:layout_height="@dimen/atlas_selected_participant_height"/>
 
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/atlas_selected_participant_avatar_margin"
         android:gravity="center"
         android:text="Chip Baker"
         android:textColor="@color/atlas_text_gray"
-        android:textSize="13sp"
-        />
+        android:textSize="13sp"/>
 
     <ImageView
         android:id="@+id/remove"

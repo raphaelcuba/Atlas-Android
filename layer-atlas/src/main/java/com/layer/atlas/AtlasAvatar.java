@@ -113,13 +113,13 @@ public class AtlasAvatar extends View {
             Diff diff = diff(mInitials.keySet(), participantIds);
             List<ImageTarget> toLoad = new ArrayList<ImageTarget>(participantIds.size());
 
-            List<ImageTarget> recycleableTargets = new ArrayList<ImageTarget>();
+            List<ImageTarget> recyclableTargets = new ArrayList<ImageTarget>();
             for (String removed : diff.removed) {
                 mInitials.remove(removed);
                 ImageTarget target = mImageTargets.remove(removed);
                 if (target != null) {
                     mPicasso.cancelRequest(target);
-                    recycleableTargets.add(target);
+                    recyclableTargets.add(target);
                 }
             }
 
@@ -129,10 +129,10 @@ public class AtlasAvatar extends View {
                 mInitials.put(added, initials(participant.getName()));
 
                 final ImageTarget target;
-                if (recycleableTargets.isEmpty()) {
+                if (recyclableTargets.isEmpty()) {
                     target = new ImageTarget(this);
                 } else {
-                    target = recycleableTargets.remove(0);
+                    target = recyclableTargets.remove(0);
                 }
                 target.setUrl(participant.getAvatarUrl());
                 mImageTargets.put(added, target);
@@ -172,6 +172,7 @@ public class AtlasAvatar extends View {
             if (avatarCount == 0) return false;
             ViewGroup.LayoutParams params = getLayoutParams();
             if (params == null) return false;
+            boolean hasBorder = (avatarCount != 1);
 
             int drawableWidth = params.width - (getPaddingLeft() + getPaddingRight());
             int drawableHeight = params.height - (getPaddingTop() + getPaddingBottom());
@@ -180,7 +181,7 @@ public class AtlasAvatar extends View {
             float fraction = (avatarCount > 1) ? MULTI_FRACTION : 1;
 
             mTextSize = fraction * density * SINGLE_TEXT_SIZE_DP;
-            mOuterRadius = fraction * (dimension / 2f);
+            mOuterRadius = fraction * dimension / 2f;
             mInnerRadius = mOuterRadius - (density * BORDER_SIZE_DP);
             mCenterX = getPaddingLeft() + mOuterRadius;
             mCenterY = getPaddingTop() + mOuterRadius;
@@ -191,7 +192,7 @@ public class AtlasAvatar extends View {
 
             synchronized (mPendingLoads) {
                 if (!mPendingLoads.isEmpty()) {
-                    int size = Math.round(mInnerRadius * 2f);
+                    int size = Math.round(hasBorder ? (mInnerRadius * 2f) : (mOuterRadius * 2f));
                     for (ImageTarget imageTarget : mPendingLoads) {
                         mPicasso.load(imageTarget.getUrl())
                                 .tag(AtlasAvatar.TAG).noPlaceholder().noFade()
@@ -213,8 +214,8 @@ public class AtlasAvatar extends View {
             int avatarCount = mInitials.size();
             canvas.drawRect(0f, 0f, canvas.getWidth(), canvas.getHeight(), PAINT_TRANSPARENT);
             if (avatarCount == 0) return;
-            boolean isBorder = (avatarCount != 1);
-            float contentRadius = isBorder ? mInnerRadius : mOuterRadius;
+            boolean hasBorder = (avatarCount != 1);
+            float contentRadius = hasBorder ? mInnerRadius : mOuterRadius;
 
             // Draw avatar cluster
             float cx = mCenterX;
@@ -222,7 +223,7 @@ public class AtlasAvatar extends View {
             mContentRect.set(cx - contentRadius, cy - contentRadius, cx + contentRadius, cy + contentRadius);
             for (Map.Entry<String, String> entry : mInitials.entrySet()) {
                 // Border / background
-                if (isBorder) canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
+                if (hasBorder) canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
 
                 // Initials or bitmap
                 ImageTarget imageTarget = mImageTargets.get(entry.getKey());
