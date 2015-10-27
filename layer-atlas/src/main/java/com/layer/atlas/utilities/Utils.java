@@ -64,7 +64,7 @@ public class Utils {
 
     public static String getConversationTitle(LayerClient client, ParticipantProvider provider, Conversation conversation) {
         String metadataTitle = (String) conversation.getMetadata().get(METADATA_KEY_CONVERSATION_TITLE);
-        if (metadataTitle != null) return metadataTitle.trim();
+        if (metadataTitle != null && !metadataTitle.trim().isEmpty()) return metadataTitle.trim();
 
         StringBuilder sb = new StringBuilder();
         String userId = client.getAuthenticatedUserId();

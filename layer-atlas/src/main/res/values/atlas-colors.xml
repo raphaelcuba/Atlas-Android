@@ -19,6 +19,7 @@
     <color name="atlas_status_bar_background">#FF198BB8</color>
     <color name="atlas_action_bar_background">#FF21AAE1</color>
     <color name="atlas_window_background">#FFFFFFFF</color>
+    <color name="atlas_navigation_bar_background">#FF000000</color>
 
     <color name="atlas_floating_button">#FF21AAE1</color>
 
