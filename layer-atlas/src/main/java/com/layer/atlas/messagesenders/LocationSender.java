@@ -19,25 +19,17 @@ import com.layer.sdk.messaging.MessageOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class LocationSender extends AttachmentSender {
     private static final String TAG = LocationSender.class.getSimpleName();
     private static final int GOOGLE_API_REQUEST_CODE = 47000;
 
     private static GoogleApiClient sGoogleApiClient;
-    private static AtomicInteger sTryCount = new AtomicInteger(3);
 
     public LocationSender(String title, Integer icon) {
         super(title, icon);
     }
 
     public static void init(final Activity activity) {
-        if (sTryCount.decrementAndGet() <= 0) {
-            Log.e(TAG, "Giving up updating Google Play Services.");
-            return;
-        }
-
         // If the client has already been created, ensure connected and return.
         if (sGoogleApiClient != null) {
             if (!sGoogleApiClient.isConnected()) sGoogleApiClient.connect();
@@ -48,7 +40,6 @@ public class LocationSender extends AttachmentSender {
 
         // If the correct Google Play Services are available, connect and return. 
         if (errorCode == ConnectionResult.SUCCESS) {
-            sTryCount.set(3);
             GoogleApiCallbacks googleApiCallbacks = new GoogleApiCallbacks();
             sGoogleApiClient = new GoogleApiClient.Builder(activity)
                     .addConnectionCallbacks(googleApiCallbacks)
