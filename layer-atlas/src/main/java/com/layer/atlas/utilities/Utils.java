@@ -79,10 +79,25 @@ public class Utils {
         return sb.toString().trim();
     }
 
-    private static String getInitials(Participant p) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(p.getName() != null && p.getName().trim().length() > 0 ? ("" + p.getName().trim().charAt(0)).toUpperCase() : "");
-        return sb.toString();
+    public static String getInitials(Participant p) {
+        return getInitials(p.getName());
+    }
+
+    public static String getInitials(String fullName) {
+        if (fullName.contains(" ")) {
+            String[] names = fullName.split(" ");
+            int count = 0;
+            StringBuilder b = new StringBuilder();
+            for (String name : names) {
+                String t = name.trim();
+                if (t.isEmpty()) continue;
+                b.append(("" + t.charAt(0)).toUpperCase());
+                if (++count >= 2) break;
+            }
+            return b.toString();
+        } else {
+            return ("" + fullName.trim().charAt(0)).toUpperCase();
+        }
     }
 
     /**

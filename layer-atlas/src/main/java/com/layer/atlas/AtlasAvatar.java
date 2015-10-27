@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.layer.atlas.provider.Participant;
 import com.layer.atlas.provider.ParticipantProvider;
+import com.layer.atlas.utilities.Utils;
 import com.layer.atlas.utilities.picasso.transformations.CircleTransform;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -128,7 +129,7 @@ public class AtlasAvatar extends View {
             for (String added : diff.added) {
                 Participant participant = mParticipantProvider.getParticipant(added);
                 if (participant == null) continue;
-                mInitials.put(added, initials(participant.getName()));
+                mInitials.put(added, Utils.getInitials(participant));
 
                 final ImageTarget target;
                 if (recyclableTargets.isEmpty()) {
@@ -246,10 +247,6 @@ public class AtlasAvatar extends View {
                 mContentRect.offset(mDeltaX, mDeltaY);
             }
         }
-    }
-
-    public static String initials(String s) {
-        return ("" + s.charAt(0)).toUpperCase();
     }
 
     private static class ImageTarget implements Target {
