@@ -31,7 +31,10 @@ public class EmptyDelEditText extends EditText {
 
     @Override
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        return new EmptyDelInputConnection(super.onCreateInputConnection(outAttrs), true);
+        InputConnection c = super.onCreateInputConnection(outAttrs);
+        // If not enabled, super returns null
+        if (c == null) return null;
+        return new EmptyDelInputConnection(c, true);
     }
 
     private class EmptyDelInputConnection extends InputConnectionWrapper {

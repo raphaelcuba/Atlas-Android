@@ -61,7 +61,7 @@ public class AtlasConversationSearch extends LinearLayout {
         super(context, attrs, defStyleAttr);
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        inflater.inflate(R.layout.atlas_conversation_launcher, this, true);
+        inflater.inflate(R.layout.atlas_conversation_search, this, true);
         mSelectedParticipantLayout = (FlowLayout) findViewById(R.id.selected_participant_group);
         mFilter = (EmptyDelEditText) findViewById(R.id.filter);
         mSelectedParticipantLayout.setStretchChild(mFilter);
@@ -108,6 +108,16 @@ public class AtlasConversationSearch extends LinearLayout {
         return this;
     }
 
+    public AtlasConversationSearch addTextChangedListener(TextWatcher textWatcher) {
+        mFilter.addTextChangedListener(textWatcher);
+        return this;
+    }
+
+    public AtlasConversationSearch removeTextChangedListener(TextWatcher textWatcher) {
+        mFilter.removeTextChangedListener(textWatcher);
+        return this;
+    }
+
     public AtlasConversationSearch setOnConversationClickListener(OnConversationClickListener onConversationClickListener) {
         mOnConversationClickListener = onConversationClickListener;
         return this;
@@ -115,6 +125,11 @@ public class AtlasConversationSearch extends LinearLayout {
 
     public AtlasConversationSearch setOnParticipantSelectionChangeListener(OnParticipantSelectionChangeListener onParticipantSelectionChangeListener) {
         mOnParticipantSelectionChangeListener = onParticipantSelectionChangeListener;
+        return this;
+    }
+
+    public AtlasConversationSearch showAvailableConversations(boolean show) {
+        mParticipantList.setVisibility(show ? VISIBLE : GONE);
         return this;
     }
 
@@ -498,7 +513,7 @@ public class AtlasConversationSearch extends LinearLayout {
             private TextView mTitle;
 
             public ViewHolder(ViewGroup parent) {
-                super(LayoutInflater.from(parent.getContext()).inflate(R.layout.atlas_conversation_launcher_item, parent, false));
+                super(LayoutInflater.from(parent.getContext()).inflate(R.layout.atlas_conversation_search_item, parent, false));
                 mAvatar = (AtlasAvatar) itemView.findViewById(R.id.avatar);
                 mTitle = (TextView) itemView.findViewById(R.id.title);
             }
