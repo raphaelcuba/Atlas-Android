@@ -43,12 +43,12 @@
     <dimen name="atlas_message_cluster_space">2dp</dimen>
     <dimen name="atlas_message_cluster_space_gap">16dp</dimen>
 
-    <dimen name="atlas_message_item_avatar_margin">2dp</dimen>
+    <dimen name="atlas_message_item_avatar_margin">8dp</dimen>
     <dimen name="atlas_message_item_avatar">24dp</dimen>
 
     <dimen name="atlas_message_item_receipt">12dp</dimen>
 
-    <dimen name="atlas_message_item_sender_name_margin_left">36dp</dimen>
+    <dimen name="atlas_message_item_sender_name_margin_left">40dp</dimen>
     <dimen name="atlas_message_item_sender_name_margin_bottom">1dp</dimen>
 
 
