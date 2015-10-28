@@ -16,18 +16,18 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="@dimen/atlas_conversation_search_item_height"
     android:background="@drawable/atlas_conversation_launcher_item_background"
     android:orientation="horizontal">
 
     <com.layer.atlas.AtlasAvatar
         android:id="@+id/avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/atlas_conversation_search_item_avatar_size"
+        android:layout_height="@dimen/atlas_conversation_search_item_avatar_size"
+        android:layout_marginBottom="@dimen/atlas_conversation_search_item_avatar_margin_bottom"
+        android:layout_marginLeft="@dimen/atlas_conversation_search_item_avatar_margin_left"
+        android:layout_marginRight="@dimen/atlas_conversation_search_item_avatar_margin_right"
+        android:layout_marginTop="@dimen/atlas_conversation_search_item_avatar_margin_top"
         />
 
     <TextView

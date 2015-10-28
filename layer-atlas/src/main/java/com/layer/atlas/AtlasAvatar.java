@@ -20,6 +20,7 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class AtlasAvatar extends View {
     private final Paint mPaintBackground = new Paint();
 
     // TODO: make these styleable
-    private static final int MAX_AVATARS = 4;
+    private static final int MAX_AVATARS = 3;
     private static final float BORDER_SIZE_DP = 1f;
     private static final float SINGLE_TEXT_SIZE_DP = 16f;
     private static final float MULTI_FRACTION = 26f / 40f;
@@ -113,6 +114,17 @@ public class AtlasAvatar extends View {
     }
 
     public AtlasAvatar setParticipants(Set<String> participantIds) {
+        // Limit to MAX_AVATARS valid avatars
+        if (participantIds.size() > MAX_AVATARS) {
+            List<String> p = new ArrayList<String>(MAX_AVATARS);
+            for (String s : participantIds) {
+                if (mParticipantProvider.getParticipant(s) == null) continue;
+                if (p.size() >= MAX_AVATARS) break;
+                p.add(s);
+            }
+            participantIds = new HashSet<String>(p);
+        }
+
         synchronized (mLock) {
             Diff diff = diff(mInitials.keySet(), participantIds);
             List<ImageTarget> toLoad = new ArrayList<ImageTarget>(participantIds.size());
@@ -127,11 +139,9 @@ public class AtlasAvatar extends View {
                 }
             }
 
-            int count = 0;
             for (String added : diff.added) {
                 Participant participant = mParticipantProvider.getParticipant(added);
                 if (participant == null) continue;
-                if (++count > MAX_AVATARS) break;
                 mInitials.put(added, Utils.getInitials(participant));
 
                 final ImageTarget target;
@@ -186,9 +196,9 @@ public class AtlasAvatar extends View {
             float density = getContext().getResources().getDisplayMetrics().density;
             float fraction = (avatarCount > 1) ? MULTI_FRACTION : 1;
 
-            mTextSize = fraction * density * SINGLE_TEXT_SIZE_DP;
             mOuterRadius = fraction * dimension / 2f;
             mInnerRadius = mOuterRadius - (density * BORDER_SIZE_DP);
+            mTextSize = mInnerRadius;
             mCenterX = getPaddingLeft() + mOuterRadius;
             mCenterY = getPaddingTop() + mOuterRadius;
 

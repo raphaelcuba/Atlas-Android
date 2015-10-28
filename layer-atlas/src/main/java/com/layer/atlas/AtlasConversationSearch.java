@@ -21,6 +21,7 @@ import com.layer.atlas.provider.Participant;
 import com.layer.atlas.provider.ParticipantProvider;
 import com.layer.atlas.utilities.views.EmptyDelEditText;
 import com.layer.atlas.utilities.views.FlowLayout;
+import com.layer.atlas.utilities.views.MaxHeightScrollView;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.CompoundPredicate;
@@ -66,6 +67,7 @@ public class AtlasConversationSearch extends LinearLayout {
         mFilter = (EmptyDelEditText) findViewById(R.id.filter);
         mSelectedParticipantLayout.setStretchChild(mFilter);
         mParticipantList = (RecyclerView) findViewById(R.id.participant_list);
+        ((MaxHeightScrollView) findViewById(R.id.selected_participant_scroll)).setMaximumHeight(getResources().getDimensionPixelSize(R.dimen.atlas_selected_participant_group_max_height));
         setOrientation(VERTICAL);
     }
 
@@ -117,6 +119,11 @@ public class AtlasConversationSearch extends LinearLayout {
         mFilter.removeTextChangedListener(textWatcher);
         return this;
     }
+    
+    public AtlasConversationSearch setOnEditorActionListener(TextView.OnEditorActionListener listener) {
+        mFilter.setOnEditorActionListener(listener);
+        return this;
+    }
 
     public AtlasConversationSearch setOnConversationClickListener(OnConversationClickListener onConversationClickListener) {
         mOnConversationClickListener = onConversationClickListener;
@@ -143,8 +150,9 @@ public class AtlasConversationSearch extends LinearLayout {
         return this;
     }
 
-    private void selectParticipant(String participantId) {
-        if (mSelectedParticipantIds.contains(participantId)) return;
+    private boolean selectParticipant(String participantId) {
+        if (mSelectedParticipantIds.contains(participantId)) return true;
+        if (mSelectedParticipantIds.size() >= 24) return false;
         mSelectedParticipantIds.add(participantId);
         ParticipantChip chip = new ParticipantChip(getContext(), mParticipantProvider, participantId, mPicasso);
         mSelectedParticipantLayout.addView(chip, mSelectedParticipantLayout.getChildCount() - 1);
@@ -153,6 +161,7 @@ public class AtlasConversationSearch extends LinearLayout {
         if (mOnParticipantSelectionChangeListener != null) {
             mOnParticipantSelectionChangeListener.onParticipantSelectionChanged(this, new ArrayList<String>(mSelectedParticipantIds));
         }
+        return true;
     }
 
     private void unselectParticipant(ParticipantChip chip) {

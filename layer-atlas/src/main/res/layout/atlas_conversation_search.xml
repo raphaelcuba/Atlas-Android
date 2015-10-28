@@ -2,20 +2,29 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.layer.atlas.utilities.views.FlowLayout
-        android:id="@+id/selected_participant_group"
+    <com.layer.atlas.utilities.views.MaxHeightScrollView
+        android:id="@+id/selected_participant_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
 
-        <com.layer.atlas.utilities.views.EmptyDelEditText
-            android:id="@+id/filter"
-            android:layout_width="wrap_content"
+        <com.layer.atlas.utilities.views.FlowLayout
+            android:id="@+id/selected_participant_group"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minWidth="32dp"
-            />
+            >
 
-    </com.layer.atlas.utilities.views.FlowLayout>
+            <com.layer.atlas.utilities.views.EmptyDelEditText
+                android:id="@+id/filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:minWidth="@dimen/atlas_participant_filter_min_width"
+                android:singleLine="true"
+                />
+
+        </com.layer.atlas.utilities.views.FlowLayout>
+    </com.layer.atlas.utilities.views.MaxHeightScrollView>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/participant_list"
