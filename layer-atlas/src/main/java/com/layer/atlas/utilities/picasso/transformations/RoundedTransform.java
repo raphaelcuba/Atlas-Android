@@ -25,10 +25,16 @@ public class RoundedTransform implements Transformation {
     @Override
     public Bitmap transform(Bitmap source) {
         if (mCornerRadius == 0f) return source;
-
+        if (source == null) return source;
+        
         int width = source.getWidth();
         int height = source.getHeight();
-        Bitmap image = Bitmap.createBitmap(width, height, source.getConfig());
+
+        // Gif returns null config, must handle it
+        Bitmap.Config config = source.getConfig();
+        if (config == null) config = Bitmap.Config.ARGB_8888;
+
+        Bitmap image = Bitmap.createBitmap(width, height, config);
         Canvas canvas = new Canvas(image);
         RectF rect = new RectF(0, 0, width, height);
 

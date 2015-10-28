@@ -96,7 +96,7 @@ public class AtlasHistoricMessageFetchLayout extends SwipeRefreshLayout implemen
     }
 
     @Override
-    public void onEventAsync(LayerChangeEvent layerChangeEvent) {
+    public void onChangeEvent(LayerChangeEvent layerChangeEvent) {
         for (LayerChange change : layerChangeEvent.getChanges()) {
             if (change.getObject() != mConversation) continue;
             if (change.getChangeType() != LayerChange.Type.UPDATE) continue;

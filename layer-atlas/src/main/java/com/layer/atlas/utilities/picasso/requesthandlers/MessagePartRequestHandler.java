@@ -51,7 +51,7 @@ public class MessagePartRequestHandler extends com.squareup.picasso.RequestHandl
 
         // Must download; make it synchronous here.
         final CountDownLatch latch = new CountDownLatch(1);
-        final LayerProgressListener listener = new LayerProgressListener() {
+        final LayerProgressListener listener = new LayerProgressListener.BackgroundThread() {
             @Override
             public void onProgressStart(MessagePart messagePart, Operation operation) {
 
