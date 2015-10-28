@@ -32,7 +32,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class AtlasConversationSearch extends LinearLayout {
 
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         mParticipantList.setLayoutManager(manager);
-        mAvailableConversationAdapter = new AvailableConversationAdapter(getContext(), mLayerClient, mParticipantProvider, mPicasso);
+        mAvailableConversationAdapter = new AvailableConversationAdapter(mLayerClient, mParticipantProvider, mPicasso);
         mParticipantList.setAdapter(mAvailableConversationAdapter);
 
         // Hitting backspace with an empty search string deletes the last selected participant
@@ -297,21 +298,20 @@ public class AtlasConversationSearch extends LinearLayout {
         protected final ParticipantProvider mParticipantProvider;
         protected final Picasso mPicasso;
         private final RecyclerViewController<Conversation> mQueryController;
-        private final LayoutInflater mInflater;
 
         private final ArrayList<String> mParticipantIds = new ArrayList<String>();
-        private final Map<String, Participant> mParticipants = new LinkedHashMap<String, Participant>();
+        private final ArrayList<Participant> mParticipants = new ArrayList<Participant>();
+        private final Map<String, Participant> mParticipantMap = new HashMap<String, Participant>();
 
-        public AvailableConversationAdapter(Context context, LayerClient client, ParticipantProvider participantProvider, Picasso picasso) {
-            this(context, client, participantProvider, picasso, null);
+        public AvailableConversationAdapter(LayerClient client, ParticipantProvider participantProvider, Picasso picasso) {
+            this(client, participantProvider, picasso, null);
         }
 
-        public AvailableConversationAdapter(Context context, LayerClient client, ParticipantProvider participantProvider, Picasso picasso, Collection<String> updateAttributes) {
+        public AvailableConversationAdapter(LayerClient client, ParticipantProvider participantProvider, Picasso picasso, Collection<String> updateAttributes) {
             mQueryController = client.newRecyclerViewController(null, updateAttributes, this);
             mLayerClient = client;
             mParticipantProvider = participantProvider;
             mPicasso = picasso;
-            mInflater = LayoutInflater.from(context);
             setHasStableIds(false);
         }
 
@@ -321,18 +321,22 @@ public class AtlasConversationSearch extends LinearLayout {
          */
         public void refresh(String filter, Set<String> selectedParticipantIds) {
             // Apply text search filter to available participants
-            mParticipantProvider.getMatchingParticipants(filter, mParticipants);
-            List<String> newParticipantIds = new ArrayList<String>(mParticipants.size());
-            for (Map.Entry<String, Participant> entry : mParticipants.entrySet()) {
-                // Don't show participants we've already selected
-                if (selectedParticipantIds.contains(entry.getKey())) continue;
+            synchronized (mParticipantIds) {
+                mParticipantProvider.getMatchingParticipants(filter, mParticipantMap);
+                mParticipants.clear();
+                for (Map.Entry<String, Participant> entry : mParticipantMap.entrySet()) {
+                    // Don't show participants we've already selected
+                    if (selectedParticipantIds.contains(entry.getKey())) continue;
+                    mParticipants.add(entry.getValue());
+                }
+                Collections.sort(mParticipants);
 
-                newParticipantIds.add(entry.getKey());
+                mParticipantIds.clear();
+                for (Participant p : mParticipants) {
+                    mParticipantIds.add(p.getId());
+                }
             }
-
-            // TODO: compute add/removes and notify those
-            mParticipantIds.clear();
-            mParticipantIds.addAll(newParticipantIds);
+            // TODO: compute add/remove/move and notify those instead of complete notify
             notifyDataSetChanged();
 
             // Filter down to only those conversations including the selected participants, hiding one-on-one conversations
@@ -362,71 +366,81 @@ public class AtlasConversationSearch extends LinearLayout {
 
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
-            switch (getType(position)) {
-                case PARTICIPANT: {
-                    position = adapterPositionToparticipantPosition(position);
-                    String participantId = mParticipantIds.get(position);
-                    Participant participant = mParticipants.get(participantId);
-                    viewHolder.mTitle.setText(participant.getName());
-                    viewHolder.itemView.setTag(participantId);
-                    viewHolder.itemView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            selectParticipant((String) v.getTag());
-                        }
-                    });
-                    viewHolder.mAvatar.setParticipants(participantId);
-                }
-                break;
-
-                case CONVERSATION: {
-                    position = adapterPositionToConversationPosition(position);
-                    Conversation conversation = mQueryController.getItem(position);
-                    String userId = mLayerClient.getAuthenticatedUserId();
-                    List<String> names = new ArrayList<String>();
-                    Set<String> ids = new LinkedHashSet<String>();
-                    for (String participantId : conversation.getParticipants()) {
-                        if (participantId.equals(userId)) continue;
-                        ids.add(participantId);
-                        Participant p = mParticipantProvider.getParticipant(participantId);
-                        if (p == null) continue;
-                        names.add(p.getName());
+            synchronized (mParticipantIds) {
+                switch (getType(position)) {
+                    case PARTICIPANT: {
+                        position = adapterPositionToParticipantPosition(position);
+                        String participantId = mParticipantIds.get(position);
+                        Participant participant = mParticipants.get(position);
+                        viewHolder.mTitle.setText(participant.getName());
+                        viewHolder.itemView.setTag(participantId);
+                        viewHolder.itemView.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                selectParticipant((String) v.getTag());
+                            }
+                        });
+                        viewHolder.mAvatar.setParticipants(participantId);
                     }
-                    viewHolder.mTitle.setText(TextUtils.join(", ", names));
-                    viewHolder.itemView.setTag(conversation);
-                    viewHolder.itemView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (mOnConversationClickListener == null) return;
-                            mOnConversationClickListener.onConversationClick(AtlasConversationSearch.this, (Conversation) v.getTag());
+                    break;
+
+                    case CONVERSATION: {
+                        position = adapterPositionToConversationPosition(position);
+                        Conversation conversation = mQueryController.getItem(position);
+                        String userId = mLayerClient.getAuthenticatedUserId();
+                        List<String> names = new ArrayList<String>();
+                        Set<String> ids = new LinkedHashSet<String>();
+                        for (String participantId : conversation.getParticipants()) {
+                            if (participantId.equals(userId)) continue;
+                            ids.add(participantId);
+                            Participant p = mParticipantProvider.getParticipant(participantId);
+                            if (p == null) continue;
+                            names.add(p.getName());
                         }
-                    });
-                    viewHolder.mAvatar.setParticipants(ids);
+                        viewHolder.mTitle.setText(TextUtils.join(", ", names));
+                        viewHolder.itemView.setTag(conversation);
+                        viewHolder.itemView.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (mOnConversationClickListener == null) return;
+                                mOnConversationClickListener.onConversationClick(AtlasConversationSearch.this, (Conversation) v.getTag());
+                            }
+                        });
+                        viewHolder.mAvatar.setParticipants(ids);
+                    }
+                    break;
                 }
-                break;
             }
         }
 
         // first are participants; then are conversations
         Type getType(int position) {
-            return (position < mParticipantIds.size()) ? Type.PARTICIPANT : Type.CONVERSATION;
+            synchronized (mParticipantIds) {
+                return (position < mParticipantIds.size()) ? Type.PARTICIPANT : Type.CONVERSATION;
+            }
         }
 
-        int adapterPositionToparticipantPosition(int position) {
+        int adapterPositionToParticipantPosition(int position) {
             return position;
         }
 
         int adapterPositionToConversationPosition(int position) {
-            return position - mParticipantIds.size();
+            synchronized (mParticipantIds) {
+                return position - mParticipantIds.size();
+            }
         }
 
         int conversationPositionToAdapterPosition(int position) {
-            return position + mParticipantIds.size();
+            synchronized (mParticipantIds) {
+                return position + mParticipantIds.size();
+            }
         }
 
         @Override
         public int getItemCount() {
-            return mQueryController.getItemCount() + mParticipantIds.size();
+            synchronized (mParticipantIds) {
+                return mQueryController.getItemCount() + mParticipantIds.size();
+            }
         }
 
 

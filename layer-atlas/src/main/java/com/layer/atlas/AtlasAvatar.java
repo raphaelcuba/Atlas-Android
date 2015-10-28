@@ -40,6 +40,7 @@ public class AtlasAvatar extends View {
     private final Paint mPaintBackground = new Paint();
 
     // TODO: make these styleable
+    private static final int MAX_AVATARS = 4;
     private static final float BORDER_SIZE_DP = 1f;
     private static final float SINGLE_TEXT_SIZE_DP = 16f;
     private static final float MULTI_FRACTION = 26f / 40f;
@@ -126,9 +127,11 @@ public class AtlasAvatar extends View {
                 }
             }
 
+            int count = 0;
             for (String added : diff.added) {
                 Participant participant = mParticipantProvider.getParticipant(added);
                 if (participant == null) continue;
+                if (++count > MAX_AVATARS) break;
                 mInitials.put(added, Utils.getInitials(participant));
 
                 final ImageTarget target;
