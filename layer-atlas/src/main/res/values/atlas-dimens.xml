@@ -14,13 +14,20 @@
      limitations under the License.    
 -->
 <resources>
-
-    <dimen name="atlas_text_size_title">20sp</dimen>
-    <dimen name="atlas_text_size_general">16sp</dimen>
-    <dimen name="atlas_text_size_smaller">14sp</dimen>
-    <dimen name="atlas_text_size_smaller2">12sp</dimen>
-    <dimen name="atlas_text_size_tiny">8sp</dimen>
-
+    <dimen name="atlas_text_size_action_bar">20sp</dimen>
+    <dimen name="atlas_text_size_button">14sp</dimen>
+    <dimen name="atlas_text_size_text_input">16sp</dimen>
+    <dimen name="atlas_text_size_conversation_item_title">16sp</dimen>
+    <dimen name="atlas_text_size_conversation_item_message">14sp</dimen>
+    <dimen name="atlas_text_size_conversation_item_date">12sp</dimen>
+    <dimen name="atlas_text_size_message_item_date">12sp</dimen>
+    <dimen name="atlas_text_size_message_item_receipt">12sp</dimen>
+    <dimen name="atlas_text_size_message_item_sender">12sp</dimen>
+    <dimen name="atlas_text_size_message_item_text">14sp</dimen>
+    <dimen name="atlas_text_size_typing_indicator">12sp</dimen>
+    <dimen name="atlas_text_size_attachment_item">14sp</dimen>
+    <dimen name="atlas_text_size_conversation_search_item">16sp</dimen>
+    <dimen name="atlas_text_size_participant_chip">13sp</dimen>
 
     <!-- ####################################################################################### -->
     <!-- # Message Items and Cells                                                             # -->

@@ -14,14 +14,13 @@
      limitations under the License.    
 -->
 <LinearLayout
-    android:id="@+id/atlas_view_conversations_list_convert"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="72dp"
     android:orientation="horizontal">
 
     <com.layer.atlas.AtlasAvatar
-        android:id="@+id/atlas_conversation_item_avatar"
+        android:id="@+id/avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="16dp"/>
@@ -58,17 +57,17 @@
                 >
 
                 <TextView
-                    android:id="@+id/atlas_conversation_view_convert_participant"
+                    android:id="@+id/title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:singleLine="true"
                     android:text="Tomaz Stolfa"
-                    android:textSize="@dimen/atlas_text_size_general"
+                    android:textSize="@dimen/atlas_text_size_conversation_item_title"
                     />
 
                 <TextView
-                    android:id="@+id/atlas_conversation_view_convert_time"
+                    android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -76,20 +75,20 @@
                     android:singleLine="true"
                     android:text="16:43"
                     android:textColor="@color/atlas_text_blue"
-                    android:textSize="@dimen/atlas_text_size_smaller2"
+                    android:textSize="@dimen/atlas_text_size_conversation_item_date"
                     />
 
             </LinearLayout>
 
             <TextView
-                android:id="@+id/atlas_conversation_view_last_message"
+                android:id="@+id/last_message"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:singleLine="true"
 
                 android:text="You did it! When are we going to see the..."
-                android:textSize="@dimen/atlas_text_size_smaller"
+                android:textSize="@dimen/atlas_text_size_conversation_item_message"
                 />
 
 

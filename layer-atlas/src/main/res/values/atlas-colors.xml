@@ -38,7 +38,9 @@
 
     <color name="atlas_view_divider">#FFE0E0E0</color>
 
-    <color name="atlas_avatar_background">#FFEBEBEB</color>
+    <color name="atlas_avatar_background">#14000000</color>
+    <color name="atlas_avatar_border">#FFFFFFFF</color>
+    <color name="atlas_avatar_text">#FF000000</color>
     <color name="atlas_chip_background">#FFEBEBEB</color>
 
     <color name="atlas_cell_them_background">#FFEBEBEB</color>

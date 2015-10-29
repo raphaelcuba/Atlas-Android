@@ -36,7 +36,7 @@
         android:layout_gravity="center"
         android:text="Item"
         android:textColor="@color/atlas_text_black"
-        android:textSize="@dimen/atlas_text_size_general"
+        android:textSize="@dimen/atlas_text_size_attachment_item"
         android:paddingLeft="16dp"
         />
 

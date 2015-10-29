@@ -21,6 +21,7 @@
                 android:imeOptions="actionDone"
                 android:minWidth="@dimen/atlas_participant_filter_min_width"
                 android:singleLine="true"
+                android:textSize="@dimen/atlas_text_size_text_input"
                 />
 
         </com.layer.atlas.utilities.views.FlowLayout>

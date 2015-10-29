@@ -38,6 +38,7 @@
         android:layout_weight="1"
         android:singleLine="true"
         android:text="Title"
+        android:textSize="@dimen/atlas_text_size_conversation_search_item"
         />
 
 </LinearLayout>

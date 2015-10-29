@@ -243,10 +243,10 @@ public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConvers
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
 
-            mAvatarCluster = (AtlasAvatar) itemView.findViewById(R.id.atlas_conversation_item_avatar);
-            mTitleView = (TextView) itemView.findViewById(R.id.atlas_conversation_view_convert_participant);
-            mMessageView = (TextView) itemView.findViewById(R.id.atlas_conversation_view_last_message);
-            mTimeView = (TextView) itemView.findViewById(R.id.atlas_conversation_view_convert_time);
+            mAvatarCluster = (AtlasAvatar) itemView.findViewById(R.id.avatar);
+            mTitleView = (TextView) itemView.findViewById(R.id.title);
+            mMessageView = (TextView) itemView.findViewById(R.id.last_message);
+            mTimeView = (TextView) itemView.findViewById(R.id.time);
         }
 
         protected ViewHolder setClickListener(OnClickListener clickListener) {

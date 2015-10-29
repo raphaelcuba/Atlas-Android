@@ -40,7 +40,7 @@
 
     <style name="AtlasMessageComposer">
         <item name="composerTextColor">@color/atlas_text_black</item>
-        <item name="composerTextSize">@dimen/atlas_text_size_general</item>
+        <item name="composerTextSize">@dimen/atlas_text_size_text_input</item>
         <item name="composerTextTypeface">normal</item>
         <item name="composerTextStyle">normal</item>
         <item name="android:enabled">true</item>
@@ -49,12 +49,12 @@
     <style name="AtlasMessageList">
         <item name="myBubbleColor">@color/atlas_cell_me_background</item>
         <item name="myTextColor">@color/atlas_text_white</item>
-        <item name="myTextSize">@dimen/atlas_text_size_general</item>
+        <item name="myTextSize">@dimen/atlas_text_size_message_item_text</item>
         <item name="myTextTypeface">normal</item>
         <item name="myTextStyle">normal</item>
         <item name="theirBubbleColor">@color/atlas_cell_them_background</item>
         <item name="theirTextColor">@color/atlas_text_black</item>
-        <item name="theirTextSize">@dimen/atlas_text_size_general</item>
+        <item name="theirTextSize">@dimen/atlas_text_size_message_item_text</item>
         <item name="theirTextTypeface">normal</item>
         <item name="theirTextStyle">normal</item>
         <item name="dateTextColor">@color/atlas_text_gray</item>
@@ -79,7 +79,7 @@
 
     <style name="AtlasTypingIndicator">
         <item name="indicatorTextColor">@color/atlas_text_black</item>
-        <item name="indicatorTextSize">@dimen/atlas_text_size_general</item>
+        <item name="indicatorTextSize">@dimen/atlas_text_size_typing_indicator</item>
         <item name="indicatorTextTypeface">normal</item>
         <item name="indicatorTextStyle">normal</item>
     </style>

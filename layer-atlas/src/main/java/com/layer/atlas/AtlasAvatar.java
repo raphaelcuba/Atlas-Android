@@ -43,7 +43,6 @@ public class AtlasAvatar extends View {
     // TODO: make these styleable
     private static final int MAX_AVATARS = 3;
     private static final float BORDER_SIZE_DP = 1f;
-    private static final float SINGLE_TEXT_SIZE_DP = 16f;
     private static final float MULTI_FRACTION = 26f / 40f;
 
     static {
@@ -55,14 +54,9 @@ public class AtlasAvatar extends View {
     }
 
     {
-        mPaintInitials.setARGB(255, 0, 0, 0);
         mPaintInitials.setAntiAlias(true);
         mPaintInitials.setSubpixelText(true);
-
-        mPaintBorder.setARGB(255, 255, 255, 255);
         mPaintBorder.setAntiAlias(true);
-
-        mPaintBackground.setARGB(255, 235, 235, 235);
         mPaintBackground.setAntiAlias(true);
     }
 
@@ -89,14 +83,23 @@ public class AtlasAvatar extends View {
 
     public AtlasAvatar(Context context) {
         super(context);
+        mPaintBackground.setColor(context.getResources().getColor(R.color.atlas_avatar_background));
+        mPaintBorder.setColor(context.getResources().getColor(R.color.atlas_avatar_border));
+        mPaintInitials.setColor(context.getResources().getColor(R.color.atlas_avatar_text));
     }
 
     public AtlasAvatar(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mPaintBackground.setColor(context.getResources().getColor(R.color.atlas_avatar_background));
+        mPaintBorder.setColor(context.getResources().getColor(R.color.atlas_avatar_border));
+        mPaintInitials.setColor(context.getResources().getColor(R.color.atlas_avatar_text));
     }
 
     public AtlasAvatar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mPaintBackground.setColor(context.getResources().getColor(R.color.atlas_avatar_background));
+        mPaintBorder.setColor(context.getResources().getColor(R.color.atlas_avatar_border));
+        mPaintInitials.setColor(context.getResources().getColor(R.color.atlas_avatar_text));
     }
 
     public AtlasAvatar init(ParticipantProvider participantProvider, Picasso picasso) {
@@ -198,7 +201,7 @@ public class AtlasAvatar extends View {
 
             mOuterRadius = fraction * dimension / 2f;
             mInnerRadius = mOuterRadius - (density * BORDER_SIZE_DP);
-            mTextSize = mInnerRadius;
+            mTextSize = mInnerRadius * 4f / 5f;
             mCenterX = getPaddingLeft() + mOuterRadius;
             mCenterY = getPaddingTop() + mOuterRadius;
 

@@ -39,6 +39,7 @@
         android:layout_weight="1"
         android:hint="Message"
         android:maxLines="4"
+        android:textSize="@dimen/atlas_text_size_text_input"
         />
 
     <Button
@@ -49,6 +50,7 @@
         android:layout_gravity="bottom"
         android:layout_marginLeft="4dp"
         android:text="SEND"
+        android:textSize="@dimen/atlas_text_size_button"
         />
 
 </LinearLayout>

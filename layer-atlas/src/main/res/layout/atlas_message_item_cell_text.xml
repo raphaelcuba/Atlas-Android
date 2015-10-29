@@ -8,5 +8,6 @@
         android:id="@+id/cell_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/atlas_text_size_message_item_text"
         />
 </merge>

@@ -15,7 +15,7 @@
         android:gravity="center"
         android:text="Chip Baker"
         android:textColor="@color/atlas_text_gray"
-        android:textSize="13sp"/>
+        android:textSize="@dimen/atlas_text_size_participant_chip"/>
 
     <ImageView
         android:id="@+id/remove"
