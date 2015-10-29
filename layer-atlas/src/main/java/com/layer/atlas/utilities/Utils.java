@@ -252,7 +252,14 @@ public class Utils {
         int fullWidth = justBounds.outWidth;
         int fullHeight = justBounds.outHeight;
         MessagePart full = client.newMessagePart("image/jpeg", new FileInputStream(file), file.length());
-        MessagePart info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
+
+        MessagePart info;
+        if (orientation == ThreePartImageCellFactory.ORIENTATION_0 || orientation == ThreePartImageCellFactory.ORIENTATION_180) {
+            info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
+        } else {
+            info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullHeight + ", \"height\":" + fullWidth + "}").getBytes());
+        }
+
         MessagePart preview;
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, "Creating PreviewImage from '" + file.getAbsolutePath() + "': " + new String(info.getData()));

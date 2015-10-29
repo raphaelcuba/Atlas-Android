@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.layer.atlas.R;
 import com.layer.atlas.utilities.Utils;
@@ -34,9 +35,10 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     private static final String TAG_FULL = TAG + ".full";
 
     public static final int ORIENTATION_0 = 0;
-    public static final int ORIENTATION_90 = 3;
     public static final int ORIENTATION_180 = 1;
-    public static final int ORIENTATION_270 = 2;
+    public static final int ORIENTATION_90 = 2;
+    public static final int ORIENTATION_270 = 3;
+
 
     public static final int PREVIEW_COMPRESSION_QUALITY = 50;
     public static final int PREVIEW_MAX_WIDTH = 512;
@@ -107,7 +109,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
     }
 
     @Override
-    public void bindCellHolder(final CellHolder cellHolder, ParsedContent info, final Message message, CellHolderSpecs specs) {
+    public void bindCellHolder(final CellHolder cellHolder, final ParsedContent info, final Message message, CellHolderSpecs specs) {
         // Get rotation and scaled dimensions
         final float rotation;
         final int[] cellDims;
@@ -119,7 +121,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
                 break;
             case ORIENTATION_90:
                 rotation = -90f;
-                cellDims = Utils.scaleDownInside(info.width, info.height, specs.maxHeight, specs.maxWidth);
+                cellDims = Utils.scaleDownInside(info.height, info.width, specs.maxHeight, specs.maxWidth);
                 cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[1], cellDims[0]));
                 break;
             case ORIENTATION_180:
@@ -129,7 +131,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
                 break;
             default:
                 rotation = 90f;
-                cellDims = Utils.scaleDownInside(info.width, info.height, specs.maxHeight, specs.maxWidth);
+                cellDims = Utils.scaleDownInside(info.height, info.width, specs.maxHeight, specs.maxWidth);
                 cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[1], cellDims[0]));
                 break;
         }
@@ -148,6 +150,13 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
             @Override
             public void onError() {
                 Log.e(TAG, "Failed to load preview image for: " + message);
+            }
+        });
+
+        cellHolder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(), info.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -175,6 +184,15 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
         @Override
         public int sizeOf() {
             return (Integer.SIZE + Integer.SIZE + Integer.SIZE) / Byte.SIZE;
+        }
+
+        @Override
+        public String toString() {
+            return "ParsedContent{" +
+                    "orientation=" + orientation +
+                    ", width=" + width +
+                    ", height=" + height +
+                    '}';
         }
     }
 
