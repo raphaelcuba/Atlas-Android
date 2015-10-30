@@ -20,7 +20,6 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -121,23 +120,27 @@ public class AtlasAvatar extends View {
     public AtlasAvatar setParticipants(Set<String> participantIds) {
         // Limit to MAX_AVATARS valid avatars, prioritizing participants with avatars.
         if (participantIds.size() > MAX_AVATARS) {
-            Queue<String> participantsWithoutAvatars = new LinkedList<String>();
-            List<String> resultingParticipants = new ArrayList<String>(MAX_AVATARS);
+            Queue<String> withAvatars = new LinkedList<String>();
+            Queue<String> withoutAvatars = new LinkedList<String>();
             for (String participantId : participantIds) {
                 Participant participant = mParticipantProvider.getParticipant(participantId);
                 if (participant == null) continue;
-                if (resultingParticipants.size() >= MAX_AVATARS) break;
-                if (participant.getAvatarUrl() == null) {
-                    participantsWithoutAvatars.add(participantId);
+                if (participant.getAvatarUrl() != null) {
+                    withAvatars.add(participantId);
                 } else {
-                    resultingParticipants.add(participantId);
+                    withoutAvatars.add(participantId);
                 }
             }
-            while (!participantsWithoutAvatars.isEmpty() && (resultingParticipants.size() < MAX_AVATARS)) {
-                resultingParticipants.add(participantsWithoutAvatars.remove());
-            }
 
-            participantIds = new HashSet<String>(resultingParticipants);
+            participantIds = new LinkedHashSet<String>();
+            int numWithout = Math.min(MAX_AVATARS - withAvatars.size(), withoutAvatars.size());
+            for (int i = 0; i < numWithout; i++) {
+                participantIds.add(withoutAvatars.remove());
+            }
+            int numWith = Math.min(MAX_AVATARS, withAvatars.size());
+            for (int i = 0; i < numWith; i++) {
+                participantIds.add(withAvatars.remove());
+            }
         }
 
         synchronized (mLock) {

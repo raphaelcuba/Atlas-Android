@@ -345,12 +345,14 @@ public class AtlasConversationSearch extends LinearLayout {
          */
         public void refresh(String filter, Set<String> selectedParticipantIds) {
             // Apply text search filter to available participants
+            String userId = mLayerClient.getAuthenticatedUserId();
             synchronized (mParticipantIds) {
                 mParticipantProvider.getMatchingParticipants(filter, mParticipantMap);
                 mParticipants.clear();
                 for (Map.Entry<String, Participant> entry : mParticipantMap.entrySet()) {
                     // Don't show participants we've already selected
                     if (selectedParticipantIds.contains(entry.getKey())) continue;
+                    if (entry.getKey().equals(userId)) continue;
                     mParticipants.add(entry.getValue());
                 }
                 Collections.sort(mParticipants);

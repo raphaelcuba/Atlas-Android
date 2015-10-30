@@ -20,6 +20,8 @@
     <color name="atlas_action_bar_background">#FF21AAE1</color>
     <color name="atlas_window_background">#FFFFFFFF</color>
     <color name="atlas_navigation_bar_background">#FF000000</color>
+    <color name="atlas_delete_background">#FFFF5252</color>
+    <color name="atlas_item_background">#FFFFFFFF</color>
 
     <color name="atlas_floating_button">#FF21AAE1</color>
 
@@ -32,7 +34,6 @@
     <color name="atlas_button_text_disabled">#42000000</color>
     <color name="atlas_button_text_pressed">#FF21AAE1</color>
 
-    <color name="atlas_item_background">#00000000</color>
     <color name="atlas_item_selected">#FFD8D8D8</color>
     <color name="atlas_item_divider">#FFE0E0E0</color>
 
@@ -48,4 +49,5 @@
 
     <color name="atlas_icon_enabled">#8A000000</color>
     <color name="atlas_icon_disabled">#3D000000</color>
+    <color name="atlas_delete_icon">#FFFFFFFF</color>
 </resources>

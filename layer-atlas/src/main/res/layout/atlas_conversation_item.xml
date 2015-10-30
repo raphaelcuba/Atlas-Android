@@ -13,87 +13,113 @@
      See the License for the specific language governing permissions and
      limitations under the License.    
 -->
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:orientation="horizontal">
+    android:layout_height="72dp">
 
-    <com.layer.atlas.AtlasAvatar
-        android:id="@+id/avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="16dp"/>
-
-    <!-- right content part -->
-    <FrameLayout
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/leavebehind"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        >
+        android:background="@color/atlas_delete_background"
+        android:orientation="horizontal"
+        android:visibility="gone">
 
-        <!-- delimiter -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_gravity="bottom"
-            android:background="@color/atlas_item_divider"
-            />
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_delete_white_24dp"
+            android:tint="@color/atlas_delete_icon"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:paddingRight="16dp"
+    </LinearLayout>
+
+    <!-- Swipeable overlay -->
+    <LinearLayout
+        android:id="@+id/swipeable"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/atlas_item_background"
+        android:orientation="horizontal">
+
+        <com.layer.atlas.AtlasAvatar
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="16dp"/>
+
+        <!-- right content part -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             >
 
-            <!-- Tomaz and time -->
+            <!-- delimiter -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="bottom"
+                android:background="@color/atlas_item_divider"
+                />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:paddingRight="16dp"
                 >
 
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="0dp"
+                <!-- Tomaz and time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:singleLine="true"
-                    android:text="Tomaz Stolfa"
-                    android:textSize="@dimen/atlas_text_size_conversation_item_title"
-                    />
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:text="Tomaz Stolfa"
+                        android:textSize="@dimen/atlas_text_size_conversation_item_title"
+                        />
+
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingLeft="8dp"
+                        android:singleLine="true"
+                        android:text="16:43"
+                        android:textColor="@color/atlas_text_blue"
+                        android:textSize="@dimen/atlas_text_size_conversation_item_date"
+                        />
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/time"
+                    android:id="@+id/last_message"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingLeft="8dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:singleLine="true"
-                    android:text="16:43"
-                    android:textColor="@color/atlas_text_blue"
-                    android:textSize="@dimen/atlas_text_size_conversation_item_date"
+
+                    android:text="You did it! When are we going to see the..."
+                    android:textSize="@dimen/atlas_text_size_conversation_item_message"
                     />
+
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/last_message"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:singleLine="true"
+        </FrameLayout>
 
-                android:text="You did it! When are we going to see the..."
-                android:textSize="@dimen/atlas_text_size_conversation_item_message"
-                />
-
-
-        </LinearLayout>
-
-    </FrameLayout>
-
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>
