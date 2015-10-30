@@ -32,9 +32,13 @@ import com.layer.atlas.cellfactories.ThreePartImageCellFactory;
 import com.layer.atlas.provider.Participant;
 import com.layer.atlas.provider.ParticipantProvider;
 import com.layer.sdk.LayerClient;
+import com.layer.sdk.changes.LayerChange;
+import com.layer.sdk.changes.LayerChangeEvent;
+import com.layer.sdk.listeners.LayerChangeEventListener;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
+import com.layer.sdk.query.Queryable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
@@ -302,5 +307,62 @@ public class Utils {
         parts[ThreePartImageCellFactory.PART_INDEX_PREVIEW] = preview;
         parts[ThreePartImageCellFactory.PART_INDEX_INFO] = info;
         return client.newMessage(parts);
+    }
+
+    /**
+     * Waits for the LayerClient to synchronize relevant data locally before calling the Callback.
+     * TODO: add timeout mechanism.
+     *
+     * @param client   LayerClient to await content for.
+     * @param id       Queryable object ID to wait for (Conversation, Message, MessagePart, etc).
+     * @param callback ContentAvailableCallback to alert success or failure.
+     */
+    public static void waitForContent(final LayerClient client, final Uri id, final ContentAvailableCallback callback) {
+        if (client == null) {
+            callback.onContentFailed(client, id, "LayerClient is null");
+            return;
+        }
+
+        if (id == null) {
+            callback.onContentFailed(client, id, "LayerObject ID is null");
+            return;
+        }
+
+        // Register an event listener that waits for the given conversation or message
+        final AtomicBoolean hasNotified = new AtomicBoolean(false);
+        LayerChangeEventListener listener = new LayerChangeEventListener.BackgroundThread() {
+            @Override
+            public void onChangeEvent(LayerChangeEvent layerChangeEvent) {
+                for (LayerChange change : layerChangeEvent.getChanges()) {
+                    Queryable q = (Queryable) change.getObject();
+                    if (!q.getId().equals(id)) continue;
+                    client.unregisterEventListener(this);
+                    if (!hasNotified.compareAndSet(false, true)) return;
+                    Log.v(TAG, "Received content for " + id);
+                    callback.onContentAvailable(client, q);
+                    return;
+                }
+            }
+        };
+        client.registerEventListener(listener);
+
+        // If content is not yet available, wait for the listener.
+        Queryable q = client.get(id);
+        if (q == null) {
+            Log.v(TAG, "Content not yet available, waiting for " + id);
+            return;
+        }
+
+        // If content is available now, abort the listener and notify now.
+        client.unregisterEventListener(listener);
+        if (!hasNotified.compareAndSet(false, true)) return;
+        Log.v(TAG, "Content already available for " + id);
+        callback.onContentAvailable(client, q);
+    }
+
+    public interface ContentAvailableCallback {
+        void onContentAvailable(LayerClient client, Queryable object);
+
+        void onContentFailed(LayerClient client, Uri objectId, String reason);
     }
 }
