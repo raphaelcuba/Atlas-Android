@@ -204,25 +204,27 @@ public class Utils {
         int orientation = ThreePartImageCellFactory.ORIENTATION_0;
         try {
             ExifInterface exifInterface = new ExifInterface(imageFile.getAbsolutePath());
-            int exifOrientation = exifInterface.getAttributeInt("Orientation", 1);
+            int exifOrientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                Log.v(TAG, "Found Exif orientation: " + exifOrientation);
+            }
             switch (exifOrientation) {
-                case 1:
-                case 2:
+                case ExifInterface.ORIENTATION_NORMAL:
+                case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
                     orientation = ThreePartImageCellFactory.ORIENTATION_0;
                     break;
-                case 3:
-                case 4:
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                case ExifInterface.ORIENTATION_FLIP_VERTICAL:
                     orientation = ThreePartImageCellFactory.ORIENTATION_180;
                     break;
-                case 5:
-                case 6:
+                case ExifInterface.ORIENTATION_TRANSPOSE:
+                case ExifInterface.ORIENTATION_ROTATE_90:
                     orientation = ThreePartImageCellFactory.ORIENTATION_270;
                     break;
-                case 7:
-                case 8:
+                case ExifInterface.ORIENTATION_TRANSVERSE:
+                case ExifInterface.ORIENTATION_ROTATE_270:
                     orientation = ThreePartImageCellFactory.ORIENTATION_90;
                     break;
-
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -253,12 +255,7 @@ public class Utils {
         int fullHeight = justBounds.outHeight;
         MessagePart full = client.newMessagePart("image/jpeg", new FileInputStream(file), file.length());
 
-        MessagePart info;
-        if (orientation == ThreePartImageCellFactory.ORIENTATION_0 || orientation == ThreePartImageCellFactory.ORIENTATION_180) {
-            info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
-        } else {
-            info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullHeight + ", \"height\":" + fullWidth + "}").getBytes());
-        }
+        MessagePart info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
 
         MessagePart preview;
         if (Log.isLoggable(TAG, Log.VERBOSE)) {

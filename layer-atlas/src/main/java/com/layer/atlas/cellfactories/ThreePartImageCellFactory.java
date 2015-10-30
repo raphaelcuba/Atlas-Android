@@ -121,7 +121,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
                 break;
             case ORIENTATION_90:
                 rotation = -90f;
-                cellDims = Utils.scaleDownInside(info.height, info.width, specs.maxHeight, specs.maxWidth);
+                cellDims = Utils.scaleDownInside(info.width, info.height, specs.maxHeight, specs.maxWidth);
                 cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[1], cellDims[0]));
                 break;
             case ORIENTATION_180:
@@ -131,7 +131,7 @@ public class ThreePartImageCellFactory extends AtlasCellFactory<ThreePartImageCe
                 break;
             default:
                 rotation = 90f;
-                cellDims = Utils.scaleDownInside(info.height, info.width, specs.maxHeight, specs.maxWidth);
+                cellDims = Utils.scaleDownInside(info.width, info.height, specs.maxHeight, specs.maxWidth);
                 cellHolder.mImageView.setLayoutParams(new FrameLayout.LayoutParams(cellDims[1], cellDims[0]));
                 break;
         }
