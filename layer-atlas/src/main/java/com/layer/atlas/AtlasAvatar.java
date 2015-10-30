@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -117,15 +119,25 @@ public class AtlasAvatar extends View {
     }
 
     public AtlasAvatar setParticipants(Set<String> participantIds) {
-        // Limit to MAX_AVATARS valid avatars
+        // Limit to MAX_AVATARS valid avatars, prioritizing participants with avatars.
         if (participantIds.size() > MAX_AVATARS) {
-            List<String> p = new ArrayList<String>(MAX_AVATARS);
-            for (String s : participantIds) {
-                if (mParticipantProvider.getParticipant(s) == null) continue;
-                if (p.size() >= MAX_AVATARS) break;
-                p.add(s);
+            Queue<String> participantsWithoutAvatars = new LinkedList<String>();
+            List<String> resultingParticipants = new ArrayList<String>(MAX_AVATARS);
+            for (String participantId : participantIds) {
+                Participant participant = mParticipantProvider.getParticipant(participantId);
+                if (participant == null) continue;
+                if (resultingParticipants.size() >= MAX_AVATARS) break;
+                if (participant.getAvatarUrl() == null) {
+                    participantsWithoutAvatars.add(participantId);
+                } else {
+                    resultingParticipants.add(participantId);
+                }
             }
-            participantIds = new HashSet<String>(p);
+            while (!participantsWithoutAvatars.isEmpty() && (resultingParticipants.size() < MAX_AVATARS)) {
+                resultingParticipants.add(participantsWithoutAvatars.remove());
+            }
+
+            participantIds = new HashSet<String>(resultingParticipants);
         }
 
         synchronized (mLock) {
