@@ -65,7 +65,6 @@ public class AtlasAvatar extends View {
     private Picasso mPicasso;
 
     // Initials and Picasso image targets by user ID
-    private final Object mLock = new Object();
     private final Map<String, ImageTarget> mImageTargets = new HashMap<String, ImageTarget>();
     private final Map<String, String> mInitials = new HashMap<String, String>();
     private final List<ImageTarget> mPendingLoads = new ArrayList<ImageTarget>();
@@ -117,6 +116,9 @@ public class AtlasAvatar extends View {
         return setParticipants(hashSet);
     }
 
+    /**
+     * Should be called from UI thread.
+     */
     public AtlasAvatar setParticipants(Set<String> participantIds) {
         // Limit to MAX_AVATARS valid avatars, prioritizing participants with avatars.
         if (participantIds.size() > MAX_AVATARS) {
@@ -143,54 +145,52 @@ public class AtlasAvatar extends View {
             }
         }
 
-        synchronized (mLock) {
-            Diff diff = diff(mInitials.keySet(), participantIds);
-            List<ImageTarget> toLoad = new ArrayList<ImageTarget>(participantIds.size());
+        Diff diff = diff(mInitials.keySet(), participantIds);
+        List<ImageTarget> toLoad = new ArrayList<ImageTarget>(participantIds.size());
 
-            List<ImageTarget> recyclableTargets = new ArrayList<ImageTarget>();
-            for (String removed : diff.removed) {
-                mInitials.remove(removed);
-                ImageTarget target = mImageTargets.remove(removed);
-                if (target != null) {
-                    mPicasso.cancelRequest(target);
-                    recyclableTargets.add(target);
-                }
-            }
-
-            for (String added : diff.added) {
-                Participant participant = mParticipantProvider.getParticipant(added);
-                if (participant == null) continue;
-                mInitials.put(added, Utils.getInitials(participant));
-
-                final ImageTarget target;
-                if (recyclableTargets.isEmpty()) {
-                    target = new ImageTarget(this);
-                } else {
-                    target = recyclableTargets.remove(0);
-                }
-                target.setUrl(participant.getAvatarUrl());
-                mImageTargets.put(added, target);
-                toLoad.add(target);
-            }
-
-            // Cancel existing in case the size or anything else changed.
-            // TODO: make caching intelligent wrt sizing
-            for (String existing : diff.existing) {
-                Participant participant = mParticipantProvider.getParticipant(existing);
-                if (participant == null) continue;
-                ImageTarget existingTarget = mImageTargets.get(existing);
-                mPicasso.cancelRequest(existingTarget);
-                toLoad.add(existingTarget);
-            }
-            for (ImageTarget target : mPendingLoads) {
+        List<ImageTarget> recyclableTargets = new ArrayList<ImageTarget>();
+        for (String removed : diff.removed) {
+            mInitials.remove(removed);
+            ImageTarget target = mImageTargets.remove(removed);
+            if (target != null) {
                 mPicasso.cancelRequest(target);
+                recyclableTargets.add(target);
             }
-            mPendingLoads.clear();
-            mPendingLoads.addAll(toLoad);
-
-            setClusterSizes();
-            return this;
         }
+
+        for (String added : diff.added) {
+            Participant participant = mParticipantProvider.getParticipant(added);
+            if (participant == null) continue;
+            mInitials.put(added, Utils.getInitials(participant));
+
+            final ImageTarget target;
+            if (recyclableTargets.isEmpty()) {
+                target = new ImageTarget(this);
+            } else {
+                target = recyclableTargets.remove(0);
+            }
+            target.setUrl(participant.getAvatarUrl());
+            mImageTargets.put(added, target);
+            toLoad.add(target);
+        }
+
+        // Cancel existing in case the size or anything else changed.
+        // TODO: make caching intelligent wrt sizing
+        for (String existing : diff.existing) {
+            Participant participant = mParticipantProvider.getParticipant(existing);
+            if (participant == null) continue;
+            ImageTarget existingTarget = mImageTargets.get(existing);
+            mPicasso.cancelRequest(existingTarget);
+            toLoad.add(existingTarget);
+        }
+        for (ImageTarget target : mPendingLoads) {
+            mPicasso.cancelRequest(target);
+        }
+        mPendingLoads.clear();
+        mPendingLoads.addAll(toLoad);
+
+        setClusterSizes();
+        return this;
     }
 
     @Override
@@ -201,82 +201,78 @@ public class AtlasAvatar extends View {
     }
 
     private boolean setClusterSizes() {
-        synchronized (mLock) {
-            int avatarCount = mInitials.size();
-            if (avatarCount == 0) return false;
-            ViewGroup.LayoutParams params = getLayoutParams();
-            if (params == null) return false;
-            boolean hasBorder = (avatarCount != 1);
+        int avatarCount = mInitials.size();
+        if (avatarCount == 0) return false;
+        ViewGroup.LayoutParams params = getLayoutParams();
+        if (params == null) return false;
+        boolean hasBorder = (avatarCount != 1);
 
-            int drawableWidth = params.width - (getPaddingLeft() + getPaddingRight());
-            int drawableHeight = params.height - (getPaddingTop() + getPaddingBottom());
-            float dimension = Math.min(drawableWidth, drawableHeight);
-            float density = getContext().getResources().getDisplayMetrics().density;
-            float fraction = (avatarCount > 1) ? MULTI_FRACTION : 1;
+        int drawableWidth = params.width - (getPaddingLeft() + getPaddingRight());
+        int drawableHeight = params.height - (getPaddingTop() + getPaddingBottom());
+        float dimension = Math.min(drawableWidth, drawableHeight);
+        float density = getContext().getResources().getDisplayMetrics().density;
+        float fraction = (avatarCount > 1) ? MULTI_FRACTION : 1;
 
-            mOuterRadius = fraction * dimension / 2f;
-            mInnerRadius = mOuterRadius - (density * BORDER_SIZE_DP);
-            mTextSize = mInnerRadius * 4f / 5f;
-            mCenterX = getPaddingLeft() + mOuterRadius;
-            mCenterY = getPaddingTop() + mOuterRadius;
+        mOuterRadius = fraction * dimension / 2f;
+        mInnerRadius = mOuterRadius - (density * BORDER_SIZE_DP);
+        mTextSize = mInnerRadius * 4f / 5f;
+        mCenterX = getPaddingLeft() + mOuterRadius;
+        mCenterY = getPaddingTop() + mOuterRadius;
 
-            float outerMultiSize = fraction * dimension;
-            mDeltaX = (drawableWidth - outerMultiSize) / (avatarCount - 1);
-            mDeltaY = (drawableHeight - outerMultiSize) / (avatarCount - 1);
+        float outerMultiSize = fraction * dimension;
+        mDeltaX = (drawableWidth - outerMultiSize) / (avatarCount - 1);
+        mDeltaY = (drawableHeight - outerMultiSize) / (avatarCount - 1);
 
-            synchronized (mPendingLoads) {
-                if (!mPendingLoads.isEmpty()) {
-                    int size = Math.round(hasBorder ? (mInnerRadius * 2f) : (mOuterRadius * 2f));
-                    for (ImageTarget imageTarget : mPendingLoads) {
-                        mPicasso.load(imageTarget.getUrl())
-                                .tag(AtlasAvatar.TAG).noPlaceholder().noFade()
-                                .centerCrop().resize(size, size)
-                                .transform((avatarCount > 1) ? MULTI_TRANSFORM : SINGLE_TRANSFORM)
-                                .into(imageTarget);
-                    }
-                    mPendingLoads.clear();
+        synchronized (mPendingLoads) {
+            if (!mPendingLoads.isEmpty()) {
+                int size = Math.round(hasBorder ? (mInnerRadius * 2f) : (mOuterRadius * 2f));
+                for (ImageTarget imageTarget : mPendingLoads) {
+                    mPicasso.load(imageTarget.getUrl())
+                            .tag(AtlasAvatar.TAG).noPlaceholder().noFade()
+                            .centerCrop().resize(size, size)
+                            .transform((avatarCount > 1) ? MULTI_TRANSFORM : SINGLE_TRANSFORM)
+                            .into(imageTarget);
                 }
+                mPendingLoads.clear();
             }
-            return true;
         }
+        return true;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        synchronized (mLock) {
-            // Clear canvas
-            int avatarCount = mInitials.size();
-            canvas.drawRect(0f, 0f, canvas.getWidth(), canvas.getHeight(), PAINT_TRANSPARENT);
-            if (avatarCount == 0) return;
-            boolean hasBorder = (avatarCount != 1);
-            float contentRadius = hasBorder ? mInnerRadius : mOuterRadius;
+        // Clear canvas
+        int avatarCount = mInitials.size();
+        canvas.drawRect(0f, 0f, canvas.getWidth(), canvas.getHeight(), PAINT_TRANSPARENT);
+        if (avatarCount == 0) return;
+        boolean hasBorder = (avatarCount != 1);
+        float contentRadius = hasBorder ? mInnerRadius : mOuterRadius;
 
-            // Draw avatar cluster
-            float cx = mCenterX;
-            float cy = mCenterY;
-            mContentRect.set(cx - contentRadius, cy - contentRadius, cx + contentRadius, cy + contentRadius);
-            for (Map.Entry<String, String> entry : mInitials.entrySet()) {
-                // Border / background
-                if (hasBorder) canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
+        // Draw avatar cluster
+        float cx = mCenterX;
+        float cy = mCenterY;
+        mContentRect.set(cx - contentRadius, cy - contentRadius, cx + contentRadius, cy + contentRadius);
+        for (Map.Entry<String, String> entry : mInitials.entrySet()) {
+            // Border / background
+            if (hasBorder) canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
 
-                // Initials or bitmap
-                ImageTarget imageTarget = mImageTargets.get(entry.getKey());
-                Bitmap bitmap = (imageTarget == null) ? null : imageTarget.getBitmap();
-                if (bitmap == null) {
-                    String initials = entry.getValue();
-                    mPaintInitials.setTextSize(mTextSize);
-                    mPaintInitials.getTextBounds(initials, 0, initials.length(), mRect);
-                    canvas.drawCircle(cx, cy, contentRadius, mPaintBackground);
-                    canvas.drawText(initials, cx - mRect.centerX(), cy - mRect.centerY() - 1f, mPaintInitials);
-                } else {
-                    canvas.drawBitmap(bitmap, mContentRect.left, mContentRect.top, PAINT_BITMAP);
-                }
-
-                // Translate for next avatar
-                cx += mDeltaX;
-                cy += mDeltaY;
-                mContentRect.offset(mDeltaX, mDeltaY);
+            // Initials or bitmap
+            ImageTarget imageTarget = mImageTargets.get(entry.getKey());
+            Bitmap bitmap = (imageTarget == null) ? null : imageTarget.getBitmap();
+            if (bitmap == null) {
+                String initials = entry.getValue();
+                mPaintInitials.setTextSize(mTextSize);
+                mPaintInitials.getTextBounds(initials, 0, initials.length(), mRect);
+                canvas.drawCircle(cx, cy, contentRadius, mPaintBackground);
+                canvas.drawText(initials, cx - mRect.centerX(), cy - mRect.centerY() - 1f, mPaintInitials);
+            } else {
+                canvas.drawBitmap(bitmap, mContentRect.left, mContentRect.top, PAINT_BITMAP);
             }
+
+            // Translate for next avatar
+            cx += mDeltaX;
+            cy += mDeltaY;
+            mContentRect.offset(mDeltaX, mDeltaY);
         }
     }
 

@@ -137,6 +137,7 @@ public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConvers
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        mQueryController.updateBoundPosition(position);
         Conversation conversation = mQueryController.getItem(position);
         viewHolder.setConversation(conversation);
         HashSet<String> participantIds = new HashSet<String>(conversation.getParticipants());

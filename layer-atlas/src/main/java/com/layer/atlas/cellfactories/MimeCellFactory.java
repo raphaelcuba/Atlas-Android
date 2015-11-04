@@ -1,5 +1,6 @@
 package com.layer.atlas.cellfactories;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,7 @@ import com.layer.sdk.messaging.MessagePart;
  */
 public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder, MimeCellFactory.ParsedContent> {
     public MimeCellFactory() {
-        super(32 * 1024);
+        super(1024 * 1024);
     }
 
     public static String getPreview(Message message) {
@@ -37,7 +38,14 @@ public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder
 
     @Override
     public CellHolder createCellHolder(ViewGroup cellView, boolean isMe, LayoutInflater layoutInflater) {
-        return new CellHolder(layoutInflater.inflate(R.layout.atlas_message_item_cell_text, cellView));
+        Context context = cellView.getContext();
+
+        View v = layoutInflater.inflate(R.layout.atlas_message_item_cell_text, cellView, true);
+        v.setBackgroundResource(isMe ? R.drawable.atlas_message_item_cell_me : R.drawable.atlas_message_item_cell_them);
+
+        TextView t = (TextView) v.findViewById(R.id.cell_text);
+        t.setTextColor(context.getResources().getColor(isMe ? R.color.atlas_text_white : R.color.atlas_text_black));
+        return new CellHolder(v);
     }
 
     @Override
@@ -46,7 +54,9 @@ public class MimeCellFactory extends AtlasCellFactory<MimeCellFactory.CellHolder
         int i = 0;
         for (MessagePart part : message.getMessageParts()) {
             if (i != 0) builder.append("\n");
-            builder.append("MIME Type [").append(i).append("]: ").append(part.getMimeType());
+            builder.append("[").append(i).append("]: ")
+                    .append(part.getSize()).append("-byte `")
+                    .append(part.getMimeType()).append("`");
             i++;
         }
         return new ParsedContent(builder.toString());
