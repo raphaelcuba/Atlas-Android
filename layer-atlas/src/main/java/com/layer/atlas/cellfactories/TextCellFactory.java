@@ -20,7 +20,7 @@ public class TextCellFactory extends AtlasCellFactory<TextCellFactory.CellHolder
         return message.getMessageParts().get(0).getMimeType().equals(MIME_TYPE);
     }
 
-    public static String getPreview(Message message) {
+    public static String getMessagePreview(Message message) {
         return new String(message.getMessageParts().get(0).getData());
     }
 

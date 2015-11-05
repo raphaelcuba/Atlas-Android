@@ -43,7 +43,7 @@ public class LocationCellFactory extends AtlasCellFactory<LocationCellFactory.Ce
         return message.getMessageParts().get(0).getMimeType().equals(MIME_TYPE);
     }
 
-    public static String getPreview(Message message) {
+    public static String getMessagePreview(Message message) {
         return "Attachment: Location";
     }
 

@@ -3,7 +3,7 @@ apply plugin: 'git-repo'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         minSdkVersion 14
@@ -21,12 +21,17 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'com.layer.sdk', name: 'layer-sdk', version: "0.19.0") {
-    }
+    // Layer SDK
+    compile 'com.layer.sdk:layer-sdk:0.19.0-LOCAL'
+    compile 'org.slf4j:slf4j-nop:1.7.2'
 
+    // Image cache and loading
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'org.slf4j:slf4j-nop:1.5.8'
+    // Image popup
+    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'
+
+    // Android UI
     compile 'com.android.support:recyclerview-v7:22.+'
     compile 'com.android.support:appcompat-v7:22.+'
     compile 'com.android.support:design:22.+'

@@ -50,4 +50,6 @@
     <color name="atlas_icon_enabled">#8A000000</color>
     <color name="atlas_icon_disabled">#3D000000</color>
     <color name="atlas_delete_icon">#FFFFFFFF</color>
+
+    <color name="atlas_image_popup_background">#FF000000</color>
 </resources>

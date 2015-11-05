@@ -35,6 +35,7 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.changes.LayerChange;
 import com.layer.sdk.changes.LayerChangeEvent;
 import com.layer.sdk.listeners.LayerChangeEventListener;
+import com.layer.sdk.listeners.LayerProgressListener;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
@@ -49,6 +50,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Utils {
@@ -59,12 +62,13 @@ public class Utils {
     public static final SimpleDateFormat sdfDayOfWeek = new SimpleDateFormat("EEE, LLL dd,");
     public static final String[] TIME_WEEKDAYS_NAMES = new String[]{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
-    public static String getLastMessageString(Message msg) {
-        if (TextCellFactory.isType(msg)) return TextCellFactory.getPreview(msg);
-        if (ThreePartImageCellFactory.isType(msg)) return ThreePartImageCellFactory.getPreview(msg);
-        if (LocationCellFactory.isType(msg)) return LocationCellFactory.getPreview(msg);
-        if (BasicImageCellFactory.isType(msg)) return BasicImageCellFactory.getPreview(msg);
-        return MimeCellFactory.getPreview(msg);
+    // TODO: base this on registered types
+    public static String getLastMessageString(Message message) {
+        if (TextCellFactory.isType(message)) return TextCellFactory.getMessagePreview(message);
+        if (ThreePartImageCellFactory.isType(message)) return ThreePartImageCellFactory.getMessagePreview(message);
+        if (LocationCellFactory.isType(message)) return LocationCellFactory.getMessagePreview(message);
+        if (BasicImageCellFactory.isType(message)) return BasicImageCellFactory.getMessagePreview(message);
+        return MimeCellFactory.getPreview(message);
     }
 
     public static String getConversationTitle(LayerClient client, ParticipantProvider provider, Conversation conversation) {
@@ -260,7 +264,7 @@ public class Utils {
         int fullHeight = justBounds.outHeight;
         MessagePart full = client.newMessagePart("image/jpeg", new FileInputStream(file), file.length());
 
-        MessagePart info = client.newMessagePart(ThreePartImageCellFactory.MIME_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
+        MessagePart info = client.newMessagePart(ThreePartImageCellFactory.MIME_TYPE_INFO, ("{\"orientation\":" + orientation + ", \"width\":" + fullWidth + ", \"height\":" + fullHeight + "}").getBytes());
 
         MessagePart preview;
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
@@ -296,7 +300,7 @@ public class Utils {
         ByteArrayOutputStream previewStream = new ByteArrayOutputStream();
         previewBitmap.compress(Bitmap.CompressFormat.JPEG, ThreePartImageCellFactory.PREVIEW_COMPRESSION_QUALITY, previewStream);
         previewBitmap.recycle();
-        preview = client.newMessagePart(ThreePartImageCellFactory.MIME_PREVIEW, previewStream.toByteArray());
+        preview = client.newMessagePart(ThreePartImageCellFactory.MIME_TYPE_PREVIEW, previewStream.toByteArray());
         previewStream.close();
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, String.format(Locale.US, "PreviewImage full bytes: %d, preview bytes: %d, info bytes: %d", full.getSize(), preview.getSize(), info.getSize()));
@@ -358,6 +362,46 @@ public class Utils {
         if (!hasNotified.compareAndSet(false, true)) return;
         Log.v(TAG, "Content already available for " + id);
         callback.onContentAvailable(client, q);
+    }
+
+    public static boolean downloadMessagePart(LayerClient layerClient, MessagePart part, int timeLength, TimeUnit timeUnit) {
+        if (part.isContentReady()) return true;
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        final LayerProgressListener listener = new LayerProgressListener.BackgroundThread() {
+            @Override
+            public void onProgressStart(MessagePart messagePart, Operation operation) {
+
+            }
+
+            @Override
+            public void onProgressUpdate(MessagePart messagePart, Operation operation, long l) {
+
+            }
+
+            @Override
+            public void onProgressComplete(MessagePart messagePart, Operation operation) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onProgressError(MessagePart messagePart, Operation operation, Throwable throwable) {
+                latch.countDown();
+            }
+        };
+        try {
+            part.download(listener);
+            if (!part.isContentReady()) {
+                try {
+                    latch.await(timeLength, timeUnit);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
+            }
+        } finally {
+            layerClient.unregisterProgressListener(part, listener);
+        }
+        return part.isContentReady();
     }
 
     public interface ContentAvailableCallback {
