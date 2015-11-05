@@ -41,7 +41,7 @@
         android:id="@+id/swipeable"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/atlas_item_background"
+        android:background="@drawable/atlas_conversation_item_background"
         android:orientation="horizontal">
 
         <com.layer.atlas.AtlasAvatar
