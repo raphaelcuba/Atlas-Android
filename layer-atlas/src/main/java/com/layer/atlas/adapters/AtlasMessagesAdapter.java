@@ -589,7 +589,7 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mRoot = (ViewGroup) itemView.findViewById(R.id.atlas_message_item_root);
+            mRoot = (ViewGroup) itemView.findViewById(R.id.swipeable);
         }
     }
 

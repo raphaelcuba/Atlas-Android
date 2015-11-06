@@ -13,10 +13,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.    
 -->
-<FrameLayout
+<com.layer.atlas.AtlasSwipeableItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="72dp">
+    android:layout_height="72dp"
+    android:background="@drawable/atlas_swipeable_item_background_selector">
 
     <LinearLayout
         android:id="@+id/leavebehind"
@@ -41,7 +42,8 @@
         android:id="@+id/swipeable"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/atlas_conversation_item_background"
+        android:background="@drawable/atlas_swipeable_item_foreground_selector"
+        android:duplicateParentState="true"
         android:orientation="horizontal">
 
         <com.layer.atlas.AtlasAvatar
@@ -122,4 +124,4 @@
         </FrameLayout>
 
     </LinearLayout>
-</FrameLayout>
+</com.layer.atlas.AtlasSwipeableItem>

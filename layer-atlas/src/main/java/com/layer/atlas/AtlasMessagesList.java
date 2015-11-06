@@ -17,6 +17,7 @@ package com.layer.atlas;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -222,6 +223,10 @@ public class AtlasMessagesList extends RecyclerView {
      * Listens for item swipes on an AtlasConversationsList.
      */
     public static abstract class OnMessageSwipeListener extends ItemTouchHelper.SimpleCallback {
+        final float SWIPE_RATIO = 0.33f;
+        final float DELETE_RATIO = 0.67f;
+        final float MIN_ALPHA = 0.2f;
+        final float MAX_ALPHA = 1f;
         private AtlasMessagesList mMessagesList;
 
         /**
@@ -233,6 +238,11 @@ public class AtlasMessagesList extends RecyclerView {
          */
         public OnMessageSwipeListener(int directions) {
             super(0, directions);
+        }
+
+        @Override
+        public float getSwipeThreshold(ViewHolder viewHolder) {
+            return DELETE_RATIO;
         }
 
         /**
@@ -253,6 +263,56 @@ public class AtlasMessagesList extends RecyclerView {
         @Override
         public boolean onMove(RecyclerView recyclerView, ViewHolder viewHolder, ViewHolder target) {
             return false;
+        }
+
+        @Override
+        public void clearView(RecyclerView recyclerView, ViewHolder viewHolder) {
+            View swipeable = viewHolder.itemView.findViewById(R.id.swipeable);
+            if (swipeable == null) {
+                super.clearView(recyclerView, viewHolder);
+                return;
+            }
+            swipeable.setTranslationX(0);
+            View leavebehind = viewHolder.itemView.findViewById(R.id.leavebehind);
+            if (leavebehind == null) return;
+            leavebehind.setVisibility(GONE);
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            float maxSwipeDelta = viewHolder.itemView.getWidth() * SWIPE_RATIO;
+            float maxDeleteDelta = viewHolder.itemView.getWidth() * DELETE_RATIO;
+
+            float swipeDelta = Math.min(Math.abs(dX), maxSwipeDelta);
+            float deleteDelta = Math.min(Math.abs(dX), maxDeleteDelta);
+
+            final float dir = Math.signum(dX);
+
+            View swipeable = viewHolder.itemView.findViewById(R.id.swipeable);
+            if (swipeable == null) {
+                super.onChildDraw(c, recyclerView, viewHolder, dir * swipeDelta, dY, actionState, isCurrentlyActive);
+                return;
+            }
+
+            // Backgrounds
+            ((AtlasSwipeableItem) viewHolder.itemView).setSwipingActive(dir != 0 || isCurrentlyActive);
+
+            if (dir == 0) {
+                swipeable.setTranslationX(0);
+            } else {
+                swipeable.setTranslationX(dir * swipeDelta);
+            }
+
+            View leavebehind = viewHolder.itemView.findViewById(R.id.leavebehind);
+            if (leavebehind == null) return;
+
+            if (dir == 0) {
+                leavebehind.setVisibility(GONE);
+            } else {
+                leavebehind.setVisibility(VISIBLE);
+                float alpha = MIN_ALPHA + ((MAX_ALPHA - MIN_ALPHA) * deleteDelta / maxDeleteDelta);
+                leavebehind.setAlpha(alpha);
+            }
         }
 
         protected void setMessagesList(AtlasMessagesList messagesList) {

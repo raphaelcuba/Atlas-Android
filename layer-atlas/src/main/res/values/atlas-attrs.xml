@@ -11,6 +11,11 @@
     <attr name="AtlasTypingIndicator" format="reference"/>
 
 
+    <declare-styleable name="AtlasSwipeableItemState">
+        <attr name="state_swiping" format="boolean"/>
+    </declare-styleable>
+
+
     <!-- #################################### -->
     <!-- Styleable Atlas Component Attributes -->
     <!-- #################################### -->

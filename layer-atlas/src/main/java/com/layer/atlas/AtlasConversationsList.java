@@ -290,7 +290,6 @@ public class AtlasConversationsList extends RecyclerView {
                 return;
             }
             swipeable.setTranslationX(0);
-            swipeable.setBackgroundResource(R.drawable.atlas_conversation_item_background);
             View leavebehind = viewHolder.itemView.findViewById(R.id.leavebehind);
             if (leavebehind == null) return;
             leavebehind.setVisibility(GONE);
@@ -313,11 +312,7 @@ public class AtlasConversationsList extends RecyclerView {
             }
 
             // Backgrounds
-            if (dir != 0 || isCurrentlyActive) {
-                swipeable.setBackgroundResource(R.drawable.atlas_conversation_item_background_swiping);
-            } else {
-                swipeable.setBackgroundResource(R.drawable.atlas_conversation_item_background);
-            }
+            ((AtlasSwipeableItem) viewHolder.itemView).setSwipingActive(dir != 0 || isCurrentlyActive);
 
             if (dir == 0) {
                 swipeable.setTranslationX(0);

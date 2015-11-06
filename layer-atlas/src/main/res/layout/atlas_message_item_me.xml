@@ -13,83 +13,109 @@
      See the License for the specific language governing permissions and
      limitations under the License.    
 -->
-<LinearLayout
-    android:id="@+id/atlas_message_item_root"
+<com.layer.atlas.AtlasSwipeableItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/atlas_message_item_margin_horizontal"
-    android:paddingRight="@dimen/atlas_message_item_margin_horizontal"
-    android:paddingTop="@dimen/atlas_message_cluster_space">
+    android:background="@drawable/atlas_swipeable_item_background_selector">
 
     <LinearLayout
-        android:id="@+id/atlas_message_item_time_group"
+        android:id="@+id/leavebehind"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="match_parent"
+        android:background="@color/atlas_delete_background"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/atlas_message_item_time_group_padding_bottom"
-        android:paddingTop="@dimen/atlas_message_item_time_group_padding_top"
-        >
+        android:visibility="gone">
 
-        <TextView
-            android:id="@+id/atlas_message_item_time_group_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Yesterday"
-            android:textColor="@color/atlas_text_gray"
-            android:textSize="@dimen/atlas_text_size_message_item_date"
-            android:textStyle="bold"
-            />
-
-        <TextView
-            android:id="@+id/atlas_message_item_time_group_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="09:08"
-            android:textColor="@color/atlas_text_gray"
-            android:textSize="@dimen/atlas_text_size_message_item_date"
-            />
-    </LinearLayout>
-
-    <Space
-        android:id="@+id/atlas_message_item_cluster_space_gap"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/atlas_message_cluster_space_gap"
-        />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1"
-        >
-
-        <android.widget.Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <FrameLayout
-            android:id="@+id/atlas_message_item_cell"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/atlas_message_item_cell_margin_far"
-            android:minHeight="@dimen/atlas_message_item_cell_min_height"
-            android:minWidth="@dimen/atlas_message_item_cell_min_width"/>
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_delete_white_24dp"
+            android:tint="@color/atlas_delete_icon"/>
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/atlas_message_item_receipt"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/swipeable"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginRight="@dimen/atlas_message_item_receipt"
-        android:text="Delivered"
-        android:textColor="@color/atlas_text_gray"
-        android:textSize="@dimen/atlas_text_size_message_item_receipt"
-        />
+        android:background="@drawable/atlas_swipeable_item_foreground_selector"
+        android:duplicateParentState="true"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/atlas_message_item_margin_horizontal"
+        android:paddingRight="@dimen/atlas_message_item_margin_horizontal"
+        android:paddingTop="@dimen/atlas_message_cluster_space">
 
-</LinearLayout>
+        <LinearLayout
+            android:id="@+id/atlas_message_item_time_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/atlas_message_item_time_group_padding_bottom"
+            android:paddingTop="@dimen/atlas_message_item_time_group_padding_top"
+            >
+
+            <TextView
+                android:id="@+id/atlas_message_item_time_group_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yesterday"
+                android:textColor="@color/atlas_text_gray"
+                android:textSize="@dimen/atlas_text_size_message_item_date"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:id="@+id/atlas_message_item_time_group_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="09:08"
+                android:textColor="@color/atlas_text_gray"
+                android:textSize="@dimen/atlas_text_size_message_item_date"
+                />
+        </LinearLayout>
+
+        <Space
+            android:id="@+id/atlas_message_item_cluster_space_gap"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/atlas_message_cluster_space_gap"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            >
+
+            <android.widget.Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <FrameLayout
+                android:id="@+id/atlas_message_item_cell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/atlas_message_item_cell_margin_far"
+                android:minHeight="@dimen/atlas_message_item_cell_min_height"
+                android:minWidth="@dimen/atlas_message_item_cell_min_width"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/atlas_message_item_receipt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="@dimen/atlas_message_item_receipt"
+            android:text="Delivered"
+            android:textColor="@color/atlas_text_gray"
+            android:textSize="@dimen/atlas_text_size_message_item_receipt"
+            />
+
+    </LinearLayout>
+</com.layer.atlas.AtlasSwipeableItem>
