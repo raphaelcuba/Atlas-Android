@@ -58,7 +58,7 @@ import java.util.Set;
  *
  * @see AtlasCellFactory
  */
-public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdapter.ViewHolder> implements RecyclerViewController.Callback {
+public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdapter.ViewHolder> implements AtlasBaseAdapter<Message>, RecyclerViewController.Callback {
     private static final String TAG = AtlasMessagesAdapter.class.getSimpleName();
 
     private final static int VIEW_TYPE_FOOTER = 0;
@@ -237,29 +237,6 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         return rootViewHolder;
     }
 
-//    LinkedHashMap<String, long[]> mTimes = new LinkedHashMap<String, long[]>();
-//
-//    private void time(String key) {
-//        long time = System.nanoTime();
-//        long[] times = mTimes.get(key);
-//        if (times == null) {
-//            mTimes.put(key, new long[]{time, 0});
-//        } else {
-//            times[1] = time;
-//        }
-//    }
-//
-//    private void printTimes() {
-//        StringBuilder b = new StringBuilder();
-//        b.append("\n");
-//        for (Map.Entry<String, long[]> entry : mTimes.entrySet()) {
-//            double delta = ((double) entry.getValue()[1] - (double) entry.getValue()[0]) / 1000000000.0;
-//            if (delta > 0.010) Log.e(TAG, entry.getKey() + " took " + delta);
-//            b.append(entry.getKey()).append(": ").append(String.format("%1.4f", delta)).append("\n");
-//        }
-//        Log.v(TAG, b.toString());
-//    }
-
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         mQueryController.updateBoundPosition(position);
@@ -388,19 +365,23 @@ public class AtlasMessagesAdapter extends RecyclerView.Adapter<AtlasMessagesAdap
         return mQueryController.getItemCount() + ((mFooterView == null) ? 0 : 1);
     }
 
+    @Override
     public Integer getPosition(Message message) {
         return mQueryController.getPosition(message);
     }
 
+    @Override
     public Integer getPosition(Message message, int lastPosition) {
         return mQueryController.getPosition(message, lastPosition);
     }
 
+    @Override
     public Message getItem(int position) {
         if (mFooterView != null && position == mFooterPosition) return null;
         return mQueryController.getItem(position);
     }
 
+    @Override
     public Message getItem(RecyclerView.ViewHolder viewHolder) {
         if (!(viewHolder instanceof CellViewHolder)) return null;
         return ((CellViewHolder) viewHolder).mMessage;

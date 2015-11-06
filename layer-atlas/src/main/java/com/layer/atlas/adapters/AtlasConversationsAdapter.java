@@ -25,7 +25,7 @@ import java.text.DateFormat;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConversationsAdapter.ViewHolder> implements RecyclerViewController.Callback {
+public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConversationsAdapter.ViewHolder> implements AtlasBaseAdapter<Conversation>, RecyclerViewController.Callback {
     protected final LayerClient mLayerClient;
     protected final ParticipantProvider mParticipantProvider;
     protected final Picasso mPicasso;
@@ -165,10 +165,22 @@ public class AtlasConversationsAdapter extends RecyclerView.Adapter<AtlasConvers
         return mQueryController.getItemCount();
     }
 
+    @Override
+    public Integer getPosition(Conversation conversation) {
+        return mQueryController.getPosition(conversation);
+    }
+
+    @Override
+    public Integer getPosition(Conversation conversation, int lastPosition) {
+        return mQueryController.getPosition(conversation, lastPosition);
+    }
+
+    @Override
     public Conversation getItem(int position) {
         return mQueryController.getItem(position);
     }
 
+    @Override
     public Conversation getItem(RecyclerView.ViewHolder viewHolder) {
         return ((ViewHolder) viewHolder).getConversation();
     }

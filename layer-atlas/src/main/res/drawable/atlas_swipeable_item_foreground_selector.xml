@@ -2,5 +2,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:atlas="http://schemas.android.com/apk/res-auto">
     <item android:drawable="@color/atlas_item_selected" android:state_pressed="true"/>
-    <item android:drawable="@drawable/atlas_swipeable_item_foreground" atlas:state_swiping="true"/>
+    <item android:drawable="@color/atlas_item_selected" atlas:state_swiping="true"/>
 </selector>
